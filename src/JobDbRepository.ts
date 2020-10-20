@@ -7,18 +7,19 @@ import {
 	MongoClientOptions,
 	UpdateQuery,
 	ObjectId,
-	SortOptionObject
+	SortOptionObject,
+	FindOneAndUpdateOption
 } from 'mongodb';
 import type { Job } from './Job';
-import { hasMongoProtocol } from './utils/hasMongoProtocol';
 import type { Agenda } from './index';
-import { IDatabaseOptions, IDbConfig, IMongoOptions } from './types/DbOptions';
-import { IJobParameters } from './types/JobParameters';
+import type { IDatabaseOptions, IDbConfig, IMongoOptions } from './types/DbOptions';
+import type { IJobParameters } from './types/JobParameters';
+import { hasMongoProtocol } from './utils/hasMongoProtocol';
 
 const log = debug('agenda:db');
 
 export class JobDbRepository {
-	collection: Collection;
+	collection: Collection<IJobParameters>;
 
 	constructor(
 		private agenda: Agenda,
@@ -104,11 +105,11 @@ export class JobDbRepository {
 		lockDeadline: Date,
 		now: Date = new Date()
 	): Promise<IJobParameters | undefined> {
-		// /**
-		// * Query used to find job to run
-		// * @type {{$and: [*]}}
-		// */
-		const JOB_PROCESS_WHERE_QUERY = {
+		/**
+		 * Query used to find job to run
+		 * @type {{$and: [*]}}
+		 */
+		const JOB_PROCESS_WHERE_QUERY: FilterQuery<IJobParameters> = {
 			$and: [
 				{
 					name: jobName,
@@ -132,13 +133,16 @@ export class JobDbRepository {
 		 * Query used to set a job as locked
 		 * @type {{$set: {lockedAt: Date}}}
 		 */
-		const JOB_PROCESS_SET_QUERY = { $set: { lockedAt: now } };
+		const JOB_PROCESS_SET_QUERY: UpdateQuery<IJobParameters> = { $set: { lockedAt: now } };
 
 		/**
 		 * Query used to affect what gets returned
 		 * @type {{returnOriginal: boolean, sort: object}}
 		 */
-		const JOB_RETURN_QUERY = { returnOriginal: false, sort: this.connectOptions.sort };
+		const JOB_RETURN_QUERY: FindOneAndUpdateOption<IJobParameters> = {
+			returnOriginal: false,
+			sort: this.connectOptions.sort
+		};
 
 		// Find ONE and ONLY ONE job and set the 'lockedAt' time so that job begins to be processed
 		const result = await this.collection.findOneAndUpdate(
@@ -206,7 +210,7 @@ export class JobDbRepository {
 		return client.db();
 	}
 
-	private processDbResult(job: Job, res: IJobParameters): Job {
+	private processDbResult(job: Job, res?: IJobParameters): Job {
 		log(
 			'processDbResult() called with success, checking whether to process job immediately or not'
 		);

@@ -4,7 +4,7 @@ import * as moment from 'moment-timezone';
 import * as humanInterval from 'human-interval';
 import * as date from 'date.js';
 import * as debug from 'debug';
-import { IJobParameters } from '../types/JobParameters';
+import type { IJobParameters } from '../types/JobParameters';
 import { isValidDate } from './date';
 
 const log = debug('agenda:nextRunAt');
@@ -15,7 +15,7 @@ const dateForTimezone = (timezoneDate: Date, timezone?: string): moment.Moment =
 		momentDate.tz(timezone);
 	}
 
-	return momentDate; // .utc(false).toDate();
+	return momentDate;
 };
 
 /**
@@ -41,7 +41,6 @@ export const computeFromInterval = (attrs: IJobParameters): Date => {
 		}
 
 		result = nextDate;
-		// Either `xo` linter or Node.js 8 stumble on this line if it isn't just ignored
 	} catch (error) {
 		// eslint-disable-line no-unused-vars
 		// Nope, humanInterval then!

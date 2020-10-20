@@ -1,9 +1,9 @@
 import * as debug from 'debug';
-import { Job } from './Job';
-import { IAgendaStatus } from './types/AgendaStatus';
-import { IJobDefinition } from './types/JobDefinition';
-import { JobProcessingQueue } from './JobProcessingQueue';
 import type { Agenda } from './index';
+import type { IAgendaStatus } from './types/AgendaStatus';
+import type { IJobDefinition } from './types/JobDefinition';
+import { Job } from './Job';
+import { JobProcessingQueue } from './JobProcessingQueue';
 
 const log = debug('agenda:jobProcessor');
 

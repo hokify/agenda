@@ -79,5 +79,5 @@ describe('Retry', () => {
 
 		await agenda.start();
 		await successPromise;
-	});
+	}).timeout(100000);
 });
