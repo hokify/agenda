@@ -12,6 +12,7 @@ import { IDatabaseOptions, IDbConfig, IMongoOptions } from './types/DbOptions';
 import { filterUndefined } from './utils/filterUndefined';
 import { JobPriority, parsePriority } from './utils/priority';
 import { IAgendaStatus } from './types/AgendaStatus';
+import { IJobParameters } from './types/JobParameters';
 
 const log = debug('agenda');
 
@@ -127,7 +128,7 @@ export class Agenda extends EventEmitter {
 		return this;
 	}
 
-	sort(query: SortOptionObject<Job>): Agenda {
+	sort(query: SortOptionObject<IJobParameters>): Agenda {
 		log('Agenda.sort([Object])');
 		this.attrs.sort = query;
 		return this;
@@ -137,7 +138,7 @@ export class Agenda extends EventEmitter {
 		return !!(config.db?.address || config.mongo);
 	}
 
-	async cancel(query: FilterQuery<Job>): Promise<number> {
+	async cancel(query: FilterQuery<IJobParameters>): Promise<number> {
 		log('attempting to cancel all Agenda jobs', query);
 		try {
 			const amountOfRemovedJobs = await this.db.removeJobs(query);
@@ -192,8 +193,8 @@ export class Agenda extends EventEmitter {
 	}
 
 	async jobs(
-		query: FilterQuery<Job> = {},
-		sort: FilterQuery<Job> = {},
+		query: FilterQuery<IJobParameters> = {},
+		sort: FilterQuery<IJobParameters> = {},
 		limit = 0,
 		skip = 0
 	): Promise<Job[]> {

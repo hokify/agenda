@@ -615,7 +615,6 @@ describe('Agenda', () => {
 			// This unit tests if for this bug [https://github.com/agenda/agenda/issues/884]
 			// which is not reproducible with default agenda config on shorter processEvery.
 			// Thus we set the test timeout to 10000, and the delay below to 6000.
-			this.timeout(10000);
 
 			const unhandledRejections: any[] = [];
 			const rejectionsHandler = error => unhandledRejections.push(error);
@@ -651,6 +650,6 @@ describe('Agenda', () => {
 			expect(j3processes).to.equal(1);
 
 			expect(unhandledRejections).to.have.length(0);
-		});
+		}).timeout(10000);
 	});
 });

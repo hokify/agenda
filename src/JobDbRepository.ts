@@ -51,15 +51,15 @@ export class JobDbRepository {
 	}
 
 	async getJobs(
-		query: FilterQuery<Job>,
-		sort: SortOptionObject<Job> = {},
+		query: FilterQuery<IJobParameters>,
+		sort: SortOptionObject<IJobParameters> = {},
 		limit = 0,
 		skip = 0
 	): Promise<IJobParameters[]> {
 		return this.collection.find(query).sort(sort).limit(limit).skip(skip).toArray();
 	}
 
-	async removeJobs(query: FilterQuery<Job>): Promise<number> {
+	async removeJobs(query: FilterQuery<IJobParameters>): Promise<number> {
 		const result = await this.collection.deleteMany(query);
 		return result.result.n || 0;
 	}
