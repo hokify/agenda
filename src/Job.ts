@@ -43,7 +43,7 @@ export class Job<DATA = any | void> {
 		args: Partial<IJobParameters<DATA>> & {
 			name: string;
 			type: 'normal' | 'single';
-			data: { [key: string]: any };
+			data: any;
 		}
 	) {
 		// Set attrs to args
