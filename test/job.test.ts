@@ -1117,6 +1117,7 @@ describe('Job', () => {
 			try {
 				await Promise.race([
 					checkResultsPromise,
+          // eslint-disable-next-line prefer-promise-reject-errors
 					new Promise((_, reject) => setTimeout(() => reject(`not processed`), 2000))
 				]);
 				console.log('4');
