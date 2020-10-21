@@ -1,7 +1,6 @@
 import { EventEmitter } from 'events';
 import * as debug from 'debug';
 
-import * as humanInterval from 'human-interval';
 import type { Db, FilterQuery, MongoClientOptions, SortOptionObject } from 'mongodb';
 import type { IJobDefinition } from './types/JobDefinition';
 import type { IAgendaConfig } from './types/AgendaConfig';
@@ -10,8 +9,9 @@ import type { IAgendaStatus } from './types/AgendaStatus';
 import type { IJobParameters } from './types/JobParameters';
 import { Job } from './Job';
 import { JobDbRepository } from './JobDbRepository';
-import { JobProcessor } from './JobProcessor';
 import { JobPriority, parsePriority } from './utils/priority';
+import { JobProcessor } from './JobProcessor';
+import { calculateProcessEvery } from './utils/processEvery';
 import { filterUndefined } from './utils/filterUndefined';
 
 const log = debug('agenda');
@@ -90,8 +90,7 @@ export class Agenda extends EventEmitter {
 
 		this.attrs = {
 			name: config.name || '',
-			processEvery:
-				(config.processEvery && humanInterval(config.processEvery)) || humanInterval('5 seconds'),
+			processEvery: calculateProcessEvery(config.processEvery),
 			defaultConcurrency: config.defaultConcurrency || 5,
 			maxConcurrency: config.maxConcurrency || 20,
 			defaultLockLimit: config.defaultLockLimit || 0,
@@ -158,7 +157,7 @@ export class Agenda extends EventEmitter {
 
 	processEvery(time: string | number): Agenda {
 		log('Agenda.processEvery(%d)', time);
-		this.attrs.processEvery = humanInterval(time);
+		this.attrs.processEvery = calculateProcessEvery(time);
 		return this;
 	}
 
