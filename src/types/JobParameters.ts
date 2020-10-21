@@ -12,7 +12,7 @@ export interface IJobParameters<DATA = any | void> {
 	 */
 	type: 'normal' | 'single';
 
-	lockedAt?: Date | null;
+	lockedAt?: Date;
 	lastFinishedAt?: Date;
 	failedAt?: Date;
 	failCount?: number;

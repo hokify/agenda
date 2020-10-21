@@ -82,7 +82,7 @@ export class JobDbRepository {
 
 	async lockJob(job: Job): Promise<IJobParameters | undefined> {
 		// Query to run against collection to see if we need to lock it
-		const criteria: FilterQuery<IJobParameters> = {
+		const criteria: FilterQuery<Omit<IJobParameters, 'lockedAt'> & { lockedAt?: Date | null }> = {
 			_id: job.attrs._id,
 			name: job.attrs.name,
 			lockedAt: null,
@@ -95,7 +95,11 @@ export class JobDbRepository {
 		const options: FindOneAndUpdateOption<IJobParameters> = { returnOriginal: false };
 
 		// Lock the job in MongoDB!
-		const resp = await this.collection.findOneAndUpdate(criteria, update, options);
+		const resp = await this.collection.findOneAndUpdate(
+			criteria as FilterQuery<IJobParameters>,
+			update,
+			options
+		);
 		return resp?.value;
 	}
 
@@ -109,7 +113,9 @@ export class JobDbRepository {
 		 * Query used to find job to run
 		 * @type {{$and: [*]}}
 		 */
-		const JOB_PROCESS_WHERE_QUERY: FilterQuery<IJobParameters> = {
+		const JOB_PROCESS_WHERE_QUERY: FilterQuery<
+			Omit<IJobParameters, 'lockedAt'> & { lockedAt?: Date | null }
+		> = {
 			$and: [
 				{
 					name: jobName,
@@ -146,7 +152,7 @@ export class JobDbRepository {
 
 		// Find ONE and ONLY ONE job and set the 'lockedAt' time so that job begins to be processed
 		const result = await this.collection.findOneAndUpdate(
-			JOB_PROCESS_WHERE_QUERY,
+			JOB_PROCESS_WHERE_QUERY as FilterQuery<IJobParameters>,
 			JOB_PROCESS_SET_QUERY,
 			JOB_RETURN_QUERY
 		);
