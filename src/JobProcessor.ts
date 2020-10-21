@@ -1,9 +1,10 @@
 import * as debug from 'debug';
 import { Job } from './Job';
-import { IAgendaStatus } from './types/AgendaStatus';
+import { IAgendaJobStatus, IAgendaStatus } from './types/AgendaStatus';
 import { IJobDefinition } from './types/JobDefinition';
 import { JobProcessingQueue } from './JobProcessingQueue';
 import type { Agenda } from './index';
+import type { IJobParameters } from './types/JobParameters';
 
 const log = debug('agenda:jobProcessor');
 
@@ -27,15 +28,15 @@ export class JobProcessor {
 
 		const jobStatus =
 			(typeof Object.fromEntries === 'function' &&
-				Object.fromEntries(
+				(Object.fromEntries(
 					Object.keys(this.jobStatus).map(job => [
 						job,
 						{
-							...this.jobStatus[job]!,
+							...this.jobStatus[job],
 							config: this.agenda.definitions[job]
 						}
 					])
-				)) ||
+				) as IAgendaJobStatus)) ||
 			undefined;
 
 		if (typeof Object.fromEntries !== 'function') {
@@ -333,7 +334,6 @@ export class JobProcessor {
 
 				this.enqueueJob(job);
 				await this.jobQueueFilling(name);
-				// this.jobProcessing();
 			} else {
 				log.extend('jobQueueFilling')('Cannot lock job [%s]', name);
 			}
@@ -344,9 +344,10 @@ export class JobProcessor {
 
 	/**
 	 * Internal method that processes any jobs in the local queue (array)
+	 * handledJobs keeps list of already processed jobs
 	 * @returns {undefined}
 	 */
-	private async jobProcessing() {
+	private jobProcessing(handledJobs: IJobParameters['_id'][] = []) {
 		// Ensure we have jobs
 		if (this.jobQueue.length === 0) {
 			return;
@@ -354,52 +355,47 @@ export class JobProcessor {
 
 		this.localQueueProcessing += 1;
 
-		let jobEnqueued = false;
-		try {
-			const now = new Date();
+		const now = new Date();
 
-			// Check if there is any job that is not blocked by concurrency
-			const job = this.jobQueue.returnNextConcurrencyFreeJob(this.jobStatus);
+		// Check if there is any job that is not blocked by concurrency
+		const job = this.jobQueue.returnNextConcurrencyFreeJob(this.jobStatus, handledJobs);
 
-			if (!job) {
-				log.extend('jobProcessing')('[%s:%s] there is no job to process');
-				return;
-			}
+		if (!job) {
+			log.extend('jobProcessing')('[%s:%s] there is no job to process');
+			return;
+		}
 
+		log.extend('jobProcessing')('[%s:%s] there is a job to process', job.attrs.name, job.attrs._id);
+
+		// If the 'nextRunAt' time is older than the current time, run the job
+		// Otherwise, setTimeout that gets called at the time of 'nextRunAt'
+		if (job.attrs.nextRunAt <= now) {
 			log.extend('jobProcessing')(
-				'[%s:%s] there is a job to process',
+				'[%s:%s] nextRunAt is in the past, run the job immediately',
 				job.attrs.name,
 				job.attrs._id
 			);
+			this.runOrRetry(job);
+		} else {
+			const runIn = job.attrs.nextRunAt.getTime() - now.getTime();
+			log.extend('jobProcessing')(
+				'[%s:%s] nextRunAt is in the future, calling setTimeout(%d)',
+				job.attrs.name,
+				job.attrs._id,
+				runIn
+			);
+			setTimeout(() => {
+				this.jobProcessing();
+			}, runIn);
+		}
 
-			// If the 'nextRunAt' time is older than the current time, run the job
-			// Otherwise, setTimeout that gets called at the time of 'nextRunAt'
-			if (job.attrs.nextRunAt <= now) {
-				log.extend('jobProcessing')(
-					'[%s:%s] nextRunAt is in the past, run the job immediately',
-					job.attrs.name,
-					job.attrs._id
-				);
-				jobEnqueued = await this.runOrRetry(job);
-			} else {
-				const runIn = job.attrs.nextRunAt.getTime() - now.getTime();
-				log.extend('jobProcessing')(
-					'[%s:%s] nextRunAt is in the future, calling setTimeout(%d)',
-					job.attrs.name,
-					job.attrs._id,
-					runIn
-				);
-				setTimeout(() => {
-					this.jobProcessing();
-				}, runIn);
-				jobEnqueued = true;
-			}
-			if (this.localQueueProcessing < this.maxConcurrency && jobEnqueued) {
-				// additionally run again and check if there are more jobs that we can process right now (as long concurrency not reached)
-				setImmediate(() => this.jobProcessing());
-			}
-		} finally {
-			this.localQueueProcessing -= 1;
+		handledJobs.push(job.attrs._id);
+
+		this.localQueueProcessing -= 1;
+
+		if (job && this.localQueueProcessing < this.maxConcurrency) {
+			// additionally run again and check if there are more jobs that we can process right now (as long concurrency not reached)
+			setImmediate(() => this.jobProcessing(handledJobs));
 		}
 	}
 
@@ -407,7 +403,7 @@ export class JobProcessor {
 	 * Internal method that tries to run a job and if it fails, retries again!
 	 * @returns {boolean} processed a job or not
 	 */
-	private async runOrRetry(job: Job): Promise<boolean> {
+	private async runOrRetry(job: Job): Promise<void> {
 		if (!this.isRunning) {
 			// const a = new Error();
 			// console.log('STACK', a.stack);
@@ -415,7 +411,7 @@ export class JobProcessor {
 				'JobProcessor got stopped already while calling runOrRetry, returning!',
 				this
 			);
-			return false;
+			return;
 		}
 
 		this.jobQueue.remove(job);
@@ -448,109 +444,107 @@ export class JobProcessor {
 
 				this.lockedJobs.splice(lockedJobIndex, 1);
 				this.updateStatus(job.attrs.name, 'locked', -1);
-				return true;
+				return;
 			}
 
-			const runJob = async () => {
-				// Add to local "running" queue
-				this.runningJobs.push(job);
-				this.updateStatus(job.attrs.name, 'running', 1);
+			// Add to local "running" queue
+			this.runningJobs.push(job);
+			this.updateStatus(job.attrs.name, 'running', 1);
 
-				try {
-					log.extend('runOrRetry')('[%s:%s] processing job', job.attrs.name, job.attrs._id);
+			try {
+				log.extend('runOrRetry')('[%s:%s] processing job', job.attrs.name, job.attrs._id);
 
-					// check if the job is still alive
-					const checkIfJobIsStillAlive = () => {
-						// check every "this.agenda.definitions[job.attrs.name].lockLifetime / 2"" (or at mininum every processEvery)
-						return new Promise((resolve, reject) =>
-							setTimeout(() => {
-								// when job is not running anymore, just finish
-								if (!job.isRunning()) {
-									resolve();
-									return;
-								}
+				// check if the job is still alive
+				const checkIfJobIsStillAlive = () => {
+					// check every "this.agenda.definitions[job.attrs.name].lockLifetime / 2"" (or at mininum every processEvery)
+					return new Promise((resolve, reject) =>
+						setTimeout(() => {
+							// when job is not running anymore, just finish
+							if (!job.isRunning()) {
+								resolve();
+								return;
+							}
 
-								if (job.isDead()) {
-									reject(
-										new Error(
-											`execution of '${job.attrs.name}' canceled, execution took more than ${
-												this.agenda.definitions[job.attrs.name].lockLifetime
-											}ms. Call touch() for long running jobs to keep them alive.`
-										)
-									);
-									return;
-								}
+							if (job.isDead()) {
+								reject(
+									new Error(
+										`execution of '${job.attrs.name}' canceled, execution took more than ${
+											this.agenda.definitions[job.attrs.name].lockLifetime
+										}ms. Call touch() for long running jobs to keep them alive.`
+									)
+								);
+								return;
+							}
 
-								resolve(checkIfJobIsStillAlive());
-							}, Math.max(this.processEvery, this.agenda.definitions[job.attrs.name].lockLifetime / 2))
-						);
-					};
+							resolve(checkIfJobIsStillAlive());
+						}, Math.max(this.processEvery, this.agenda.definitions[job.attrs.name].lockLifetime / 2))
+					);
+				};
 
-					// CALL THE ACTUAL METHOD TO PROCESS THE JOB!!!
-					await Promise.race([job.run(), checkIfJobIsStillAlive()]);
+				// CALL THE ACTUAL METHOD TO PROCESS THE JOB!!!
+				await Promise.race([job.run(), checkIfJobIsStillAlive()]);
 
+				log.extend('runOrRetry')(
+					'[%s:%s] processing job successfull',
+					job.attrs.name,
+					job.attrs._id
+				);
+
+				// Job isn't in running jobs so throw an error
+				if (!this.runningJobs.includes(job)) {
 					log.extend('runOrRetry')(
-						'[%s:%s] processing job successfull',
-						job.attrs.name,
+						'[%s] callback was called, job must have been marked as complete already',
 						job.attrs._id
 					);
-
-					// Job isn't in running jobs so throw an error
-					if (!this.runningJobs.includes(job)) {
-						log.extend('runOrRetry')(
-							'[%s] callback was called, job must have been marked as complete already',
-							job.attrs._id
-						);
-						throw new Error(
-							`callback already called - job ${job.attrs.name} already marked complete`
-						);
-					}
-				} catch (err) {
-					job.canceled = err;
-					log.extend('runOrRetry')(
-						'[%s:%s] processing job failed',
-						job.attrs.name,
-						job.attrs._id,
-						err
+					throw new Error(
+						`callback already called - job ${job.attrs.name} already marked complete`
 					);
-					job.agenda.emit('error', err);
-				} finally {
-					// Remove the job from the running queue
-					let runningJobIndex = this.runningJobs.indexOf(job);
-					if (runningJobIndex === -1) {
-						// lookup by id
-						runningJobIndex = this.runningJobs.findIndex(
-							j => j.attrs._id?.toString() === job.attrs._id?.toString()
-						);
-					}
-					if (runningJobIndex === -1) {
-						// eslint-disable-next-line no-unsafe-finally
-						throw new Error(`cannot find job ${job.attrs._id} in running jobs queue?`);
-					}
-					this.runningJobs.splice(runningJobIndex, 1);
-					this.updateStatus(job.attrs.name, 'running', -1);
-
-					// Remove the job from the locked queue
-					let lockedJobIndex = this.lockedJobs.indexOf(job);
-					if (lockedJobIndex === -1) {
-						// lookup by id
-						lockedJobIndex = this.lockedJobs.findIndex(
-							j => j.attrs._id?.toString() === job.attrs._id?.toString()
-						);
-					}
-					if (lockedJobIndex === -1) {
-						// eslint-disable-next-line no-unsafe-finally
-						throw new Error(`cannot find job ${job.attrs._id} in locked jobs queue?`);
-					}
-					this.lockedJobs.splice(lockedJobIndex, 1);
-					this.updateStatus(job.attrs.name, 'locked', -1);
 				}
+			} catch (err) {
+				// eslint-disable-next-line no-param-reassign
+				job.canceled = err;
+				log.extend('runOrRetry')(
+					'[%s:%s] processing job failed',
+					job.attrs.name,
+					job.attrs._id,
+					err
+				);
+				job.agenda.emit('error', err);
+			} finally {
+				// Remove the job from the running queue
+				let runningJobIndex = this.runningJobs.indexOf(job);
+				if (runningJobIndex === -1) {
+					// lookup by id
+					runningJobIndex = this.runningJobs.findIndex(
+						j => j.attrs._id?.toString() === job.attrs._id?.toString()
+					);
+				}
+				if (runningJobIndex === -1) {
+					// eslint-disable-next-line no-unsafe-finally
+					throw new Error(`cannot find job ${job.attrs._id} in running jobs queue?`);
+				}
+				this.runningJobs.splice(runningJobIndex, 1);
+				this.updateStatus(job.attrs.name, 'running', -1);
 
-				// Re-process jobs now that one has finished
-				setImmediate(() => this.jobProcessing());
-			};
-			runJob();
-			return true;
+				// Remove the job from the locked queue
+				let lockedJobIndex = this.lockedJobs.indexOf(job);
+				if (lockedJobIndex === -1) {
+					// lookup by id
+					lockedJobIndex = this.lockedJobs.findIndex(
+						j => j.attrs._id?.toString() === job.attrs._id?.toString()
+					);
+				}
+				if (lockedJobIndex === -1) {
+					// eslint-disable-next-line no-unsafe-finally
+					throw new Error(`cannot find job ${job.attrs._id} in locked jobs queue?`);
+				}
+				this.lockedJobs.splice(lockedJobIndex, 1);
+				this.updateStatus(job.attrs.name, 'locked', -1);
+			}
+
+			// Re-process jobs now that one has finished
+			setImmediate(() => this.jobProcessing());
+			return;
 		}
 
 		// Run the job later
@@ -560,7 +554,6 @@ export class JobProcessor {
 			job.attrs._id
 		);
 		this.enqueueJob(job);
-		return false;
 	}
 
 	private updateStatus(name: string, key: 'locked' | 'running', number: -1 | 1) {
@@ -570,8 +563,7 @@ export class JobProcessor {
 				running: 0
 			};
 		}
-		// if ((this.jobStatus[name]![key] > 0 && number === -1) || number === 1) {
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		this.jobStatus[name]![key] += number;
-		// }
 	}
 }

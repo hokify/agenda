@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.28](https://github.com/hokify/agenda/compare/v4.0.27...v4.0.28) (2020-10-20)
+
+
+### Bug Fixes
+
+* **tests:** rm console log from debugging ([b211c8e](https://github.com/hokify/agenda/commit/b211c8e7a30c731a3f2c3c9f01603f904bb52660))
+
+### [4.0.27](https://github.com/hokify/agenda/compare/v4.0.26...v4.0.27) (2020-10-20)
+
+
+### Bug Fixes
+
+* **define:** warning if job definition exists already ([3fe9a6d](https://github.com/hokify/agenda/commit/3fe9a6d69e5dd177d513e54f1386980280201369))
+* **job:** ensure agenda is ready before calling save job ([be4c026](https://github.com/hokify/agenda/commit/be4c0268c829676e61a9ad45fcf66d714d8923ca))
+* **test:** cleanup tests ([c5d081a](https://github.com/hokify/agenda/commit/c5d081a5c4be45b44ffc4aba56c0be4b9dcdd714))
+* **test:** debug failed lock expire test ([7d69680](https://github.com/hokify/agenda/commit/7d69680f4d69663037ee238480d96e2788e1f572))
+* **test:** debug failed priority test ([924287c](https://github.com/hokify/agenda/commit/924287c4419a19dfc16ba756e3e064e163b1b048))
+* **test:** fix timeout check ([e92cd85](https://github.com/hokify/agenda/commit/e92cd85c80a1e092405f00066359d595be03ad2f))
+* **typings:** names -> name ([c2ca928](https://github.com/hokify/agenda/commit/c2ca9286abdc46b7aa22024170bf9e73f142a9e9))
+
+### [4.0.26](https://github.com/hokify/agenda/compare/v4.0.25...v4.0.26) (2020-10-20)
+
+
+### Bug Fixes
+
+* **test:** just check if there are almost all jobs running ([b2a5e6e](https://github.com/hokify/agenda/commit/b2a5e6ebf99aa3b1749b671eeadf0c6e08e4bae8))
+
+### [4.0.25](https://github.com/hokify/agenda/compare/v4.0.24...v4.0.25) (2020-10-20)
+
+
+### Bug Fixes
+
+* **jobprocessor:** check for object.fromEntries for node 10 support ([#3](https://github.com/hokify/agenda/issues/3)) ([b8cc61f](https://github.com/hokify/agenda/commit/b8cc61fe1e4199437d65014bff03cab65e6e077f))
+* **jobprocessor:** ensure returnNextConcurrencyFreeJob is not returning same job each time ([11d6606](https://github.com/hokify/agenda/commit/11d6606706d70416a6d28a95dd65ab11576f8e51))
+* **jobprocessor:** set job enqueud to true for future jobs ([a3d4203](https://github.com/hokify/agenda/commit/a3d42032011f868628862942737cdfc1594bb02b))
+* **test:** unlock job test fix ([6446b64](https://github.com/hokify/agenda/commit/6446b64c9f22bbbb2ec098cec5c55ca9d659d439))
+* more typings, minor functionality changes ([#2](https://github.com/hokify/agenda/issues/2)) ([b13d054](https://github.com/hokify/agenda/commit/b13d054889638e218a2706f05512340e764c395b))
+
 ### [4.0.24](https://github.com/hokify/agenda/compare/v4.0.22...v4.0.24) (2020-10-20)
 
 
