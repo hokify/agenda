@@ -82,7 +82,7 @@ export class JobDbRepository {
 
 	async lockJob(job: Job): Promise<IJobParameters | undefined> {
 		// Query to run against collection to see if we need to lock it
-		const criteria = {
+		const criteria: FilterQuery<IJobParameters> = {
 			_id: job.attrs._id,
 			name: job.attrs.name,
 			lockedAt: null,
@@ -91,8 +91,8 @@ export class JobDbRepository {
 		};
 
 		// Update / options for the MongoDB query
-		const update = { $set: { lockedAt: new Date() } };
-		const options = { returnOriginal: false };
+		const update: UpdateQuery<IJobParameters> = { $set: { lockedAt: new Date() } };
+		const options: FindOneAndUpdateOption<IJobParameters> = { returnOriginal: false };
 
 		// Lock the job in MongoDB!
 		const resp = await this.collection.findOneAndUpdate(criteria, update, options);
@@ -242,7 +242,6 @@ export class JobDbRepository {
 
 			// Grab information needed to save job but that we don't want to persist in MongoDB
 			const id = job.attrs._id;
-			// const { unique, uniqueOpts } = job.attrs;
 
 			// Store job as JSON and remove props we don't want to store from object
 			// _id, unique, uniqueOpts
@@ -308,7 +307,7 @@ export class JobDbRepository {
 					update,
 					{
 						upsert: true,
-						returnOriginal: false // same as new: true -> returns the final document
+						returnOriginal: false
 					}
 				);
 				log(
@@ -328,8 +327,6 @@ export class JobDbRepository {
 				if (job.attrs.uniqueOpts?.insertOnly) {
 					update = { $setOnInsert: props };
 				}
-
-				// console.log('update', query, update, uniqueOpts);
 
 				// Use the 'unique' query object to find an existing job or create a new one
 				log('calling findOneAndUpdate() with unique object as query: \n%O', query);
