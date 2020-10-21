@@ -6,13 +6,12 @@ export interface IJobParameters<DATA = unknown | void> {
 
 	name: string;
 	priority: number;
-	nextRunAt: Date | null;
+	nextRunAt?: Date | null;
 	/**
-	 * // once: the job is just queued in the database --> this does not really exists, it's just  fallback
 	 * normal: job is queued and will be processed (regular case when the user adds a new job)
 	 * single: job with this name is only queued once, if there is an exisitn gentry in the database, the job is just updated, but not newly inserted (this is used for .every())
 	 */
-	type: /* 'once' | */ 'normal' | 'single';
+	type: 'normal' | 'single';
 
 	lockedAt?: Date;
 	lastFinishedAt?: Date;
