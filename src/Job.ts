@@ -74,7 +74,6 @@ export class Job<DATA = unknown | void> {
 			}
 		});
 
-		// console.log('toJson', this.attrs, result);
 		return result as IJobParameters;
 	}
 

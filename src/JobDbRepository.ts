@@ -294,7 +294,7 @@ export class JobDbRepository {
 				if (props.nextRunAt && props.nextRunAt <= now) {
 					log('job has a scheduled nextRunAt time, protecting that field from upsert');
 					protect.nextRunAt = props.nextRunAt;
-					delete props.nextRunAt;
+					delete (props as Partial<IJobParameters>).nextRunAt;
 				}
 
 				// If we have things to protect, set them in MongoDB using $setOnInsert

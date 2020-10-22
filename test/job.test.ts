@@ -1105,23 +1105,23 @@ describe('Job', () => {
 				})
 			);
 
-			console.log('1');
+			// console.log('1');
 			await Promise.all([
 				agenda.create('priority').schedule(now).save(),
 				agenda.create('priority').schedule(now).priority('low').save(),
 				agenda.create('priority').schedule(now).priority('high').save()
 			]);
-			console.log('2');
+			// console.log('2');
 			await agenda.start();
-			console.log('3');
+			// console.log('3');
 			try {
 				await Promise.race([
 					checkResultsPromise,
 					new Promise((_, reject) => setTimeout(() => reject(`not processed`), 2000))
 				]);
-				console.log('4');
+				// console.log('4');
 			} catch (err) {
-				console.log('stats', JSON.stringify(await agenda.getRunningStats(), undefined, 3));
+				// console.log('stats', JSON.stringify(await agenda.getRunningStats(), undefined, 3));
 			}
 		});
 
