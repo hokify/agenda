@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import * as debug from 'debug';
 
-import type { Db, FilterQuery, MongoClientOptions, SortOptionObject } from 'mongodb';
+import type { Db, FilterQuery, MongoClientOptions, ObjectId, SortOptionObject } from 'mongodb';
 import type { IJobDefinition } from './types/JobDefinition';
 import type { IAgendaConfig } from './types/AgendaConfig';
 import type { IDatabaseOptions, IDbConfig, IMongoOptions } from './types/DbOptions';
@@ -12,7 +12,6 @@ import { JobDbRepository } from './JobDbRepository';
 import { JobPriority, parsePriority } from './utils/priority';
 import { JobProcessor } from './JobProcessor';
 import { calculateProcessEvery } from './utils/processEvery';
-import { filterUndefined } from './utils/filterUndefined';
 
 const log = debug('agenda');
 
@@ -420,12 +419,12 @@ export class Agenda extends EventEmitter {
 
 		log('Agenda.stop called, clearing interval for processJobs()');
 
-		const lockedJobs = this.jobProcessor?.stop();
+		const lockedJobs = this.jobProcessor?.stop() || [];
 
 		log('Agenda._unlockJobs()');
-		const jobIds = filterUndefined(lockedJobs?.map(job => job.attrs._id) || []);
+		const jobIds = lockedJobs?.map(job => job.attrs._id as ObjectId).filter(n => n);
 
-		if (jobIds.length > 0) {
+		if (jobIds.length !== 0) {
 			log('about to unlock jobs with ids: %O', jobIds);
 			await this.db.unlockJobs(jobIds);
 		}
@@ -434,11 +433,6 @@ export class Agenda extends EventEmitter {
 
 		this.jobProcessor = undefined;
 	}
-
-	// fina;
-	// Agenda.prototype.saveJob = save_job; -> moved to JobDbRepository
-
-	// Agenda.prototype._findAndLockNextJob = find_and_lock_next_job; -> moved to JobProcessor
 }
 
 export * from './types/AgendaConfig';
