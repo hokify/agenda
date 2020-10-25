@@ -45,14 +45,14 @@ export class Agenda extends EventEmitter {
 	// internally used
 	on(event: 'processJob', listener: (job: Job) => void): this;
 
-	on(event: 'fail', listener: (err: Error, job: Job) => void): this;
+	on(event: 'fail', listener: (error: Error, job: Job) => void): this;
 	on(event: 'success', listener: (job: Job) => void): this;
 	on(event: 'start', listener: (job: Job) => void): this;
 	on(event: 'complete', listener: (job: Job) => void): this;
 	on(event: string, listener: (job: Job) => void): this;
-	on(event: string, listener: (err: Error, job: Job) => void): this;
+	on(event: string, listener: (error: Error, job: Job) => void): this;
 	on(event: 'ready', listener: () => void): this;
-	on(event: 'error', listener: (err: Error) => void): this;
+	on(event: 'error', listener: (error: Error) => void): this;
 	on(event: string, listener: (...args) => void): this {
 		return super.on(event, listener);
 	}
@@ -84,7 +84,7 @@ export class Agenda extends EventEmitter {
 			// eslint-disable-next-line @typescript-eslint/ban-types
 		} & (IDatabaseOptions | IMongoOptions | {}) &
 			IDbConfig = {},
-		cb?: (err?: Error) => void
+		cb?: (error?: Error) => void
 	) {
 		super();
 
@@ -215,7 +215,7 @@ export class Agenda extends EventEmitter {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	define<DATA = any>(
 		name: string,
-		processor: (agendaJob: Job<DATA>, done: (err?: Error) => void) => void,
+		processor: (agendaJob: Job<DATA>, done: (error?: Error) => void) => void,
 		options?: Partial<Pick<IJobDefinition, 'lockLimit' | 'lockLifetime' | 'concurrency'>> & {
 			priority?: JobPriority;
 		}

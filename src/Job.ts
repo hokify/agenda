@@ -258,16 +258,16 @@ export class Job<DATA = unknown | void> {
 				log('[%s:%s] process function being called', this.attrs.name, this.attrs._id);
 				await new Promise((resolve, reject) => {
 					try {
-						const result = definition.fn(this, err => {
-							if (err) {
-								reject(err);
+						const result = definition.fn(this, error => {
+							if (error) {
+								reject(error);
 								return;
 							}
 							resolve();
 						});
 
 						if (this.isPromise(result)) {
-							result.catch((err: Error) => reject(err));
+							result.catch((error: Error) => reject(error));
 						}
 					} catch (error) {
 						reject(error);
