@@ -133,8 +133,10 @@ export class Agenda extends EventEmitter {
 		return this;
 	}
 
-	private hasDatabaseConfig(config): config is (IDatabaseOptions | IMongoOptions) & IDbConfig {
-		return !!(config.db?.address || config.mongo);
+	private hasDatabaseConfig(
+		config: unknown
+	): config is (IDatabaseOptions | IMongoOptions) & IDbConfig {
+		return !!((config as IDatabaseOptions)?.db?.address || (config as IMongoOptions)?.mongo);
 	}
 
 	async cancel(query: FilterQuery<IJobParameters>): Promise<number> {
@@ -230,7 +232,7 @@ export class Agenda extends EventEmitter {
 	): void;
 	define(
 		name: string,
-		processor: ((job) => Promise<void>) | ((job, done) => void),
+		processor: ((job: Job) => Promise<void>) | ((job: Job, done) => void),
 		options?: Partial<Pick<IJobDefinition, 'lockLimit' | 'lockLifetime' | 'concurrency'>> & {
 			priority?: JobPriority;
 		}
@@ -355,7 +357,7 @@ export class Agenda extends EventEmitter {
 		names: string | string[],
 		data?: unknown
 	): Promise<Job | Job[]> {
-		const createJob = async name => {
+		const createJob = async (name: string) => {
 			const job = this.create(name, data);
 
 			await job.schedule(when).save();

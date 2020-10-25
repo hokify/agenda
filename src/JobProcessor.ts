@@ -302,7 +302,7 @@ export class JobProcessor {
 	 * @param {String} name fill a queue with specific job name
 	 * @returns {undefined}
 	 */
-	private async jobQueueFilling(name) {
+	private async jobQueueFilling(name: string): Promise<void> {
 		// Don't lock because of a limit we have set (lockLimit, etc)
 		if (!this.shouldLock(name)) {
 			log.extend('jobQueueFilling')('lock limit reached in queue filling for [%s]', name);

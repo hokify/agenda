@@ -43,12 +43,12 @@ export class JobDbRepository {
 		throw new Error('invalid db config, or db config not found');
 	}
 
-	private hasMongoConnection(connectOptions): connectOptions is IMongoOptions {
-		return !!connectOptions.mongo;
+	private hasMongoConnection(connectOptions: unknown): connectOptions is IMongoOptions {
+		return !!(connectOptions as IMongoOptions)?.mongo;
 	}
 
-	private hasDatabaseConfig(connectOptions): connectOptions is IDatabaseOptions {
-		return !!connectOptions.db?.address;
+	private hasDatabaseConfig(connectOptions: unknown): connectOptions is IDatabaseOptions {
+		return !!(connectOptions as IDatabaseOptions)?.db?.address;
 	}
 
 	async getJobs(
