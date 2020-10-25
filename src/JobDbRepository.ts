@@ -193,8 +193,9 @@ export class JobDbRepository {
 					{ name: 'findAndLockNextJobIndex' }
 				);
 				log('index succesfully created', result);
-			} catch (err) {
-				console.error('db index creation failed', err);
+			} catch (error) {
+				log('db index creation failed', error);
+				throw error;
 			}
 		}
 

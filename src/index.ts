@@ -236,7 +236,7 @@ export class Agenda extends EventEmitter {
 		}
 	): void {
 		if (this.definitions[name]) {
-			console.warn('overwriting already defined agenda job', name);
+			log('overwriting already defined agenda job', name);
 		}
 		this.definitions[name] = {
 			fn: processor,

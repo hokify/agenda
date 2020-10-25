@@ -516,16 +516,16 @@ export class JobProcessor {
 						`callback already called - job ${job.attrs.name} already marked complete`
 					);
 				}
-			} catch (err) {
+			} catch (error) {
 				// eslint-disable-next-line no-param-reassign
-				job.canceled = err;
+				job.canceled = error;
 				log.extend('runOrRetry')(
 					'[%s:%s] processing job failed',
 					job.attrs.name,
 					job.attrs._id,
-					err
+					error
 				);
-				this.agenda.emit('error', err);
+				this.agenda.emit('error', error);
 			} finally {
 				// Remove the job from the running queue
 				let runningJobIndex = this.runningJobs.indexOf(job);
