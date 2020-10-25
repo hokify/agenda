@@ -1,8 +1,8 @@
 import * as date from 'date.js';
 import * as debug from 'debug';
 import type { Agenda } from './index';
-import type { IJobParameters } from './types/JobParameters';
 import type { DefinitionProcessor } from './types/JobDefinition';
+import { IJobParameters, datefields, TJobDatefield } from './types/JobParameters';
 import { JobPriority, parsePriority } from './utils/priority';
 import { computeFromInterval, computeFromRepeatAt } from './utils/nextRunAt';
 
@@ -57,24 +57,18 @@ export class Job<DATA = unknown | void> {
 	}
 
 	toJson(): IJobParameters {
-		const attrs = this.attrs || {};
-		const result = {};
+		const result = {} as IJobParameters;
 
-		// eslint-disable-next-line no-restricted-syntax
-		for (const prop in attrs) {
-			if ({}.hasOwnProperty.call(attrs, prop)) {
-				result[prop] = attrs[prop];
+		for (const key of Object.keys(this.attrs)) {
+			if (Object.hasOwnProperty.call(this.attrs, key)) {
+				result[key] =
+					datefields.includes(key as TJobDatefield) && this.attrs[key]
+						? new Date(this.attrs[key])
+						: this.attrs[key];
 			}
 		}
 
-		const dates = ['lastRunAt', 'lastFinishedAt', 'nextRunAt', 'failedAt', 'lockedAt'];
-		dates.forEach(d => {
-			if (result[d]) {
-				result[d] = new Date(result[d]);
-			}
-		});
-
-		return result as IJobParameters;
+		return result;
 	}
 
 	repeatEvery(
@@ -152,7 +146,16 @@ export class Job<DATA = unknown | void> {
 		return this;
 	}
 
-	isRunning(): boolean {
+	async isRunning(): Promise<boolean> {
+		const definition = this.agenda.definitions[this.attrs.name];
+		if (!definition) {
+			// we have no job definition, therfore we are not the job processor, but a client call
+			// so we get the real state from database
+			const dbJob = await this.agenda.db.getJobs({ _id: this.attrs._id });
+			this.attrs.lastRunAt = dbJob[0].lastRunAt;
+			this.attrs.lastFinishedAt = dbJob[0].lastFinishedAt;
+		}
+
 		if (!this.attrs.lastRunAt) {
 			return false;
 		}
@@ -183,6 +186,10 @@ export class Job<DATA = unknown | void> {
 
 	isDead(): boolean {
 		const definition = this.agenda.definitions[this.attrs.name];
+		if (!definition) {
+			console.warn('this method is only callable from an agenda job processor');
+			return false;
+		}
 		const lockDeadline = new Date(Date.now() - definition.lockLifetime);
 
 		// This means a job has "expired", as in it has not been "touched" within the lockoutTime
@@ -224,9 +231,9 @@ export class Job<DATA = unknown | void> {
 			} else {
 				this.attrs.nextRunAt = null;
 			}
-		} catch (err) {
+		} catch (error) {
 			this.attrs.nextRunAt = null;
-			this.fail(err);
+			this.fail(error);
 		}
 
 		return this;
@@ -258,22 +265,19 @@ export class Job<DATA = unknown | void> {
 				log('[%s:%s] process function being called', this.attrs.name, this.attrs._id);
 				await new Promise((resolve, reject) => {
 					try {
-						const result = (definition.fn as DefinitionProcessor<DATA, (err?) => void>)(
-							this,
-							err => {
-								if (err) {
-									reject(err);
-									return;
-								}
-								resolve();
+						const result = definition.fn(this, error => {
+							if (error) {
+								reject(error);
+								return;
 							}
-						);
+							resolve();
+						});
+
 						if (this.isPromise(result)) {
-							// eslint-disable-next-line @typescript-eslint/no-explicit-any
-							(result as any).catch(err => reject(err));
+							result.catch((error: Error) => reject(error));
 						}
-					} catch (err) {
-						reject(err);
+					} catch (error) {
+						reject(error);
 					}
 				});
 			} else {
@@ -286,14 +290,14 @@ export class Job<DATA = unknown | void> {
 			this.agenda.emit('success', this);
 			this.agenda.emit(`success:${this.attrs.name}`, this);
 			log('[%s:%s] has succeeded', this.attrs.name, this.attrs._id);
-		} catch (err) {
+		} catch (error) {
 			log('[%s:%s] unknown error occurred', this.attrs.name, this.attrs._id);
 
-			this.fail(err);
+			this.fail(error);
 
-			this.agenda.emit('fail', err, this);
-			this.agenda.emit(`fail:${this.attrs.name}`, err, this);
-			log('[%s:%s] has failed [%s]', this.attrs.name, this.attrs._id, err.message);
+			this.agenda.emit('fail', error, this);
+			this.agenda.emit(`fail:${this.attrs.name}`, error, this);
+			log('[%s:%s] has failed [%s]', this.attrs.name, this.attrs._id, error.message);
 		} finally {
 			this.attrs.lockedAt = undefined;
 			await this.save();
@@ -310,7 +314,7 @@ export class Job<DATA = unknown | void> {
 		}
 	}
 
-	private isPromise(value): value is Promise<void> {
-		return !!(value && typeof value.then === 'function');
+	private isPromise(value: unknown): value is Promise<void> {
+		return !!(value && typeof (value as Promise<void>).then === 'function');
 	}
 }

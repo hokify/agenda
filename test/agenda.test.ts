@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import * as delay from 'delay';
 import { Db } from 'mongodb';
 import { expect } from 'chai';
@@ -463,7 +464,7 @@ describe('Agenda', () => {
 
 			it('runs the job immediately', async () => {
 				globalAgenda.define('immediateJob', async job => {
-					expect(job.isRunning()).to.be.equal(true);
+					expect(await job.isRunning()).to.be.equal(true);
 					await globalAgenda.stop();
 				});
 				await globalAgenda.now('immediateJob');
@@ -606,6 +607,55 @@ describe('Agenda', () => {
 			expect(job1.attrs.data).to.equal(3);
 			expect(job2.attrs.data).to.equal(2);
 			expect(job3.attrs.data).to.equal(1);
+		});
+	});
+
+	describe('ensureIndex findAndLockNextJobIndex', () => {
+		it('ensureIndex-Option false does not create index findAndLockNextJobIndex', async () => {
+			const agenda = new Agenda({
+				mongo: mongoDb,
+				ensureIndex: false
+			});
+
+			agenda.define('someJob', jobProcessor);
+			await agenda.create('someJob', 1).save();
+
+			const listIndex = await mongoDb.command({ listIndexes: 'agendaJobs' });
+			expect(listIndex.cursor.firstBatch).to.have.lengthOf(1);
+			expect(listIndex.cursor.firstBatch[0].name).to.be.equal('_id_');
+		});
+
+		it('ensureIndex-Option true does create index findAndLockNextJobIndex', async () => {
+			const agenda = new Agenda({
+				mongo: mongoDb,
+				ensureIndex: true
+			});
+
+			agenda.define('someJob', jobProcessor);
+			await agenda.create('someJob', 1).save();
+
+			const listIndex = await mongoDb.command({ listIndexes: 'agendaJobs' });
+			expect(listIndex.cursor.firstBatch).to.have.lengthOf(2);
+			expect(listIndex.cursor.firstBatch[0].name).to.be.equal('_id_');
+			expect(listIndex.cursor.firstBatch[1].name).to.be.equal('findAndLockNextJobIndex');
+		});
+
+		it('creating two agenda-instances with ensureIndex-Option true does not throw an error', async () => {
+			const agenda = new Agenda({
+				mongo: mongoDb,
+				ensureIndex: true
+			});
+
+			agenda.define('someJob', jobProcessor);
+			await agenda.create('someJob', 1).save();
+
+			const secondAgenda = new Agenda({
+				mongo: mongoDb,
+				ensureIndex: true
+			});
+
+			secondAgenda.define('someJob', jobProcessor);
+			await secondAgenda.create('someJob', 1).save();
 		});
 	});
 

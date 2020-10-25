@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import * as path from 'path';
 import * as cp from 'child_process';
 import { expect } from 'chai';
@@ -71,6 +72,26 @@ describe('Job', () => {
 		});
 		it('returns the job', () => {
 			expect(job.repeatAt('3:30pm')).to.equal(job);
+		});
+	});
+
+	describe('toJSON', () => {
+		it('failedAt', () => {
+			let job = new Job(agenda, {
+				name: 'demo',
+				type: 'normal',
+				nextRunAt: null,
+				failedAt: null as any
+			});
+			expect(job.toJson().failedAt).to.be.not.a('Date');
+
+			job = new Job(agenda, {
+				name: 'demo',
+				type: 'normal',
+				nextRunAt: null,
+				failedAt: new Date()
+			});
+			expect(job.toJson().failedAt).to.be.a('Date');
 		});
 	});
 
@@ -1027,7 +1048,8 @@ describe('Job', () => {
 				]);
 				expect(results).not.to.contain(2);
 			} catch (err) {
-				console.log('stats', JSON.stringify(await agenda.getRunningStats(), undefined, 3));
+				console.log('stats', err, JSON.stringify(await agenda.getRunningStats(), undefined, 3));
+				throw err;
 			}
 		});
 
@@ -1064,14 +1086,15 @@ describe('Job', () => {
 				]);
 				expect(results.join('')).to.eql(results.sort().join(''));
 			} catch (err) {
-				console.log('stats', JSON.stringify(await agenda.getRunningStats(), undefined, 3));
+				console.log('stats', err, JSON.stringify(await agenda.getRunningStats(), undefined, 3));
+				throw err;
 			}
 		});
 
 		it('should run jobs as first in first out (FIFO) with respect to priority', async () => {
 			const now = Date.now();
 
-			agenda.define('fifo-priority', (job, cb) => cb(), { concurrency: 1 });
+			agenda.define('fifo-priority', (job, cb) => setTimeout(cb, 100), { concurrency: 1 });
 
 			const checkResultsPromise = new Promise(resolve => {
 				const times: number[] = [];
@@ -1112,7 +1135,8 @@ describe('Job', () => {
 				expect(times.join('')).to.eql(times.sort().join(''));
 				expect(priorities).to.eql([10, 10, -10]);
 			} catch (err) {
-				console.log('stats', JSON.stringify(await agenda.getRunningStats(), undefined, 3));
+				console.log('stats', err, JSON.stringify(await agenda.getRunningStats(), undefined, 3));
+				throw err;
 			}
 		});
 
@@ -1150,7 +1174,8 @@ describe('Job', () => {
 				]);
 				expect(results).to.eql([10, 0, -10]);
 			} catch (err) {
-				// console.log('stats', JSON.stringify(await agenda.getRunningStats(), undefined, 3));
+				console.log('stats', JSON.stringify(await agenda.getRunningStats(), undefined, 3));
+				throw err;
 			}
 		});
 
