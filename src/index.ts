@@ -103,10 +103,12 @@ export class Agenda extends EventEmitter {
 
 		if (this.hasDatabaseConfig(config)) {
 			this.db = new JobDbRepository(this, config);
-			this.db.connect();
-		}
-
-		if (cb) {
+			this.db.connect().then(() => {
+				if (cb) {
+					this.ready.then(() => cb());
+				}
+			});
+		} else if (cb) {
 			this.ready.then(() => cb());
 		}
 	}
