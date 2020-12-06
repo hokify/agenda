@@ -5,7 +5,6 @@ import * as debug from 'debug';
 import { parseExpression } from 'cron-parser';
 import { isValidDate } from './isValidDate';
 import type { IJobParameters } from '../types/JobParameters';
-import type { ArgumentsType } from '../types/ArgumentsType';
 
 const log = debug('agenda:nextRunAt');
 
@@ -32,13 +31,11 @@ export const computeFromInterval = (attrs: IJobParameters): Date => {
 
 	const lastRun = dateForTimezone(attrs.lastRunAt || new Date(), attrs.repeatTimezone);
 
-	const cronOptions: ArgumentsType<typeof parseExpression>[1] = {
-		currentDate: lastRun.toDate()
+	const cronOptions = {
+		currentDate: lastRun.toDate(),
+		tz: attrs.repeatTimezone
 	};
 
-	if (attrs.repeatTimezone) {
-		cronOptions.tz = attrs.repeatTimezone;
-	}
 	let nextRunAt: Date | null = null;
 
 	if (typeof attrs.repeatInterval === 'string') {
