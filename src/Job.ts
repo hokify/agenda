@@ -63,6 +63,7 @@ export class Job<DATA = unknown | void> {
 			// Set defaults if undefined
 			priority: parsePriority(args.priority),
 			nextRunAt: args.nextRunAt === undefined ? new Date() : args.nextRunAt,
+			disabled: args?.disabled ?? false,
 			type: args.type
 		};
 	}
