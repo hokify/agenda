@@ -35,8 +35,10 @@ export class Job<DATA = unknown | void> {
 		if (this.forkedChild) {
 			try {
 				this.forkedChild.send('cancel');
+				// eslint-disable-next-line no-console
 				console.info('canceled child', this.attrs.name, this.attrs._id);
 			} catch (err) {
+				// eslint-disable-next-line no-console
 				console.log('cannot send cancel to child');
 			}
 		}
@@ -388,6 +390,7 @@ export class Job<DATA = unknown | void> {
 					let childError: any;
 					this.forkedChild.on('close', code => {
 						if (code) {
+							// eslint-disable-next-line no-console
 							console.info(
 								'fork parameters',
 								forkHelper,
