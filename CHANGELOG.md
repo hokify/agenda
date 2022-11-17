@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [6.2.13](https://github.com/hokify/agenda/compare/v6.2.12...v6.2.13) (2022-11-17)
+
+
+### Bug Fixes
+
+* ready and error events are allowed wihtin sub workers ([cb4228c](https://github.com/hokify/agenda/commit/cb4228c21c4d96be8425c420650671de6b518b8d))
+* use definition keys for status list ([485060a](https://github.com/hokify/agenda/commit/485060a2813cbfd231e709495db52a0879bd057c))
+
 ### [6.2.12](https://github.com/hokify/agenda/compare/v6.2.11...v6.2.12) (2022-08-02)
 
 
