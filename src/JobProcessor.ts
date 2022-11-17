@@ -25,8 +25,7 @@ export class JobProcessor {
 	private localQueueProcessing = 0;
 
 	async getStatus(fullDetails = false): Promise<IAgendaStatus> {
-		const jobStatus = Object.keys(this.jobStatus).reduce((obj, key) => {
-			// eslint-disable-next-line no-param-reassign
+		const jobStatus = Object.keys(this.agenda.definitions).reduce((obj, key) => {
 			obj[key] = {
 				...this.jobStatus[key],
 				config: this.agenda.definitions[key]
