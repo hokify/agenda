@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.3.0](https://github.com/hokify/agenda/compare/v6.2.13...v6.3.0) (2022-12-09)
+
+
+### Features
+
+* add localLockLimitReached ([af90bcb](https://github.com/hokify/agenda/commit/af90bcb333902e0699361dace4c680b9c57ebd7c))
+
+
+### Bug Fixes
+
+* add error message to forked child and give it a chance to die ([7cf3c57](https://github.com/hokify/agenda/commit/7cf3c57c618ce8f3ae47571724fe6d087418fa5e))
+
 ### [6.2.13](https://github.com/hokify/agenda/compare/v6.2.12...v6.2.13) (2022-11-17)
 
 
