@@ -1,12 +1,8 @@
 import { Agenda } from '../../src';
 
-process.on('message', message => {
-	if (message === 'cancel') {
-		process.exit(2);
-	} else {
-		console.log('got message', message);
-	}
-});
+function isCancelMessage(message): message is { type: 'cancel'; error: string } {
+	return message !== null && typeof message === 'object' && message.type === 'cancel';
+}
 
 (async () => {
 	/** do other required initializations */
@@ -50,7 +46,21 @@ process.on('message', message => {
 	}
 
 	// run this job now
-	await agenda.runForkedJob(jobId);
+	const job = await agenda.getForkedJob(jobId);
+
+	process.on('message', message => {
+		if (isCancelMessage(message)) {
+			job.cancel(message.error);
+			setTimeout(() => {
+				// kill it after 10 seconds
+				process.exit(2);
+			}, 10000);
+		} else {
+			console.log('got message', message);
+		}
+	});
+
+	await job.runJob();
 
 	// disconnect database and exit
 	process.exit(0);

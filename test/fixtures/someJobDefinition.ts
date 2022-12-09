@@ -6,7 +6,12 @@ export default (agenda: Agenda, _definitionOnly = false) => {
 		if (job.attrs.data?.failIt === 'error') {
 			throw new Error('intended error :-)');
 		} else if (job.attrs.data?.failIt === 'die') {
-			process.exit(2);
+			process.exit(3);
+		} else if (job.attrs.data?.failIt === 'timeout') {
+			await new Promise(resolve => {
+				setTimeout(resolve, 5000);
+			});
 		}
+		await job.touch();
 	});
 };

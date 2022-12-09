@@ -20,7 +20,7 @@ export class Job<DATA = unknown | void> {
 	 * you can use it for long running tasks to periodically check if canceled is true,
 	 * also touch will check if and throws that the job got canceled
 	 */
-	private canceled?: Error | true;
+	private canceled?: Error | string | true;
 
 	getCanceledMessage() {
 		return typeof this.canceled === 'object'
@@ -30,14 +30,17 @@ export class Job<DATA = unknown | void> {
 
 	private forkedChild?: ChildProcess;
 
-	cancel(error?: Error) {
+	cancel(error?: Error | string) {
 		this.agenda.emit(`cancel:${this.attrs.name}`, this);
 		this.canceled = error || true;
 		if (this.forkedChild) {
 			try {
-				this.forkedChild.send('cancel');
+				this.forkedChild.send({
+					type: 'cancel',
+					error: this.canceled instanceof Error ? this.canceled.message : this.canceled
+				});
 				// eslint-disable-next-line no-console
-				console.info('canceled child', this.attrs.name, this.attrs._id);
+				console.info('send canceled child', this.attrs.name, this.attrs._id);
 			} catch (err) {
 				// eslint-disable-next-line no-console
 				console.log('cannot send cancel to child');

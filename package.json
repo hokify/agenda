@@ -59,26 +59,26 @@
     "mongodb": "^4"
   },
   "devDependencies": {
-    "eslint": "^8.27.0",
-    "prettier": "^2.7.1",
-    "@hokify/eslint-config": "^2.3.6",
+    "eslint": "^8.29.0",
+    "prettier": "^2.8.1",
+    "@hokify/eslint-config": "^2.3.8",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/chai": "^4.3.4",
     "@types/debug": "^4.1.7",
     "@types/human-interval": "^1.0.0",
     "@types/luxon": "^3.1.0",
-    "@types/mocha": "^10.0.0",
-    "@types/node": "^18.11.9",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^18.11.12",
     "@types/sinon": "^10.0.13",
     "chai": "^4.3.7",
     "delay": "5.0.0",
     "mocha": "10.1.0",
-    "mongodb-memory-server": "^8.10.0",
+    "mongodb-memory-server": "^8.10.1",
     "nyc": "^15.1.0",
-    "sinon": "14.0.2",
+    "sinon": "15.0.0",
     "standard-version": "^9.5.0",
     "ts-node": "^10.9.1",
     "typedoc": "^0.23.21",
-    "typescript": "^4.9.3"
+    "typescript": "^4.9.4"
   }
 }

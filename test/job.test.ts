@@ -1785,5 +1785,49 @@ describe('Job', () => {
 			expect(jobDataFinished?.failReason).to.not.be.eq(null);
 			expect(jobDataFinished?.failCount).to.be.eq(1);
 		});
+
+		it('runs a job in fork mode, but let it timeout', async () => {
+			const agendaFork = new Agenda({
+				mongo: mongoDb,
+				forkHelper: {
+					path: './test/helpers/forkHelper.ts',
+					options: {
+						env: { DB_CONNECTION: mongoCfg },
+						execArgv: ['-r', 'ts-node/register']
+					}
+				},
+				defaultLockLifetime: 1000
+			});
+
+			expect(agendaFork.forkHelper?.path).to.be.eq('./test/helpers/forkHelper.ts');
+
+			const job = agendaFork.create('some job', { failIt: 'timeout' });
+			job.forkMode(true);
+			job.schedule('now');
+			await job.save();
+
+			const jobData = await agenda.db.getJobById(job.attrs._id as any);
+
+			if (!jobData) {
+				throw new Error('job not found');
+			}
+
+			expect(jobData.fork).to.be.eq(true);
+
+			// initialize job definition (keep in a seperate file to have a easier fork mode implementation)
+			someJobDefinition(agendaFork);
+
+			await agendaFork.start();
+
+			do {
+				// console.log('.');
+				await delay(50);
+			} while (await job.isRunning());
+
+			const jobDataFinished = await agenda.db.getJobById(job.attrs._id as any);
+			expect(jobDataFinished?.lastFinishedAt).to.not.be.eq(undefined);
+			expect(jobDataFinished?.failReason).to.not.be.eq(null);
+			expect(jobDataFinished?.failCount).to.be.eq(1);
+		});
 	});
 });

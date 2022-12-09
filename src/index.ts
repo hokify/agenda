@@ -76,13 +76,13 @@ export class Agenda extends EventEmitter {
 		return !!this.jobProcessor;
 	}
 
-	async runForkedJob(jobId: string) {
+	async getForkedJob(jobId: string) {
 		const jobData = await this.db.getJobById(jobId);
 		if (!jobData) {
 			throw new Error('db entry not found');
 		}
 		const job = new Job(this, jobData);
-		await job.runJob();
+		return job;
 	}
 
 	async getRunningStats(fullDetails = false): Promise<IAgendaStatus> {
@@ -555,6 +555,9 @@ export class Agenda extends EventEmitter {
 		const lockedJobs = this.jobProcessor.stop();
 
 		log('Agenda._unlockJobs()');
+
+		lockedJobs?.forEach(job => job.cancel(new Error('agenda stopped')));
+
 		const jobIds = lockedJobs?.map(job => job.attrs._id) || [];
 
 		if (jobIds.length > 0) {
