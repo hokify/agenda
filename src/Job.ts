@@ -31,6 +31,7 @@ export class Job<DATA = unknown | void> {
 	private forkedChild?: ChildProcess;
 
 	cancel(error?: Error) {
+		this.agenda.emit(`cancel:${this.attrs.name}`, this);
 		this.canceled = error || true;
 		if (this.forkedChild) {
 			try {

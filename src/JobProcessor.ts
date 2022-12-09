@@ -24,6 +24,8 @@ export class JobProcessor {
 
 	private localQueueProcessing = 0;
 
+	private localLockLimitReached = 0;
+
 	async getStatus(fullDetails = false): Promise<IAgendaStatus> {
 		const jobStatus = Object.keys(this.agenda.definitions).reduce((obj, key) => {
 			obj[key] = {
@@ -38,7 +40,8 @@ export class JobProcessor {
 			queueName: this.agenda.attrs.name,
 			totalQueueSizeDB: await this.agenda.db.getQueueSize(),
 			internal: {
-				localQueueProcessing: this.localQueueProcessing
+				localQueueProcessing: this.localQueueProcessing,
+				localLockLimitReached: this.localLockLimitReached
 			},
 			config: {
 				totalLockLimit: this.totalLockLimit,
@@ -230,6 +233,7 @@ export class JobProcessor {
 				// future locking interval.
 				if (!this.shouldLock(job.attrs.name)) {
 					log.extend('lockOnTheFly')('lock limit hit for: [%s:%S]', job.attrs.name, job.attrs._id);
+					this.updateStatus(job.attrs.name, 'lockLimitReached', +1);
 					this.jobsToLock = [];
 					return;
 				}
@@ -252,6 +256,7 @@ export class JobProcessor {
 							'lock limit reached while job was locked in database. Releasing lock on [%s]',
 							jobToEnqueue.attrs.name
 						);
+						this.updateStatus(jobToEnqueue.attrs.name, 'lockLimitReached', +1);
 						this.agenda.db.unlockJob(jobToEnqueue);
 
 						this.jobsToLock = [];
@@ -314,6 +319,7 @@ export class JobProcessor {
 		try {
 			// Don't lock because of a limit we have set (lockLimit, etc)
 			if (!this.shouldLock(name)) {
+				this.updateStatus(name, 'lockLimitReached', +1);
 				log.extend('jobQueueFilling')('lock limit reached in queue filling for [%s]', name);
 				return;
 			}
@@ -343,6 +349,7 @@ export class JobProcessor {
 						'lock limit reached before job was returned. Releasing lock on [%s]',
 						name
 					);
+					this.updateStatus(name, 'lockLimitReached', +1);
 					this.agenda.db.unlockJob(job);
 					return;
 				}
@@ -628,7 +635,11 @@ export class JobProcessor {
 		this.enqueueJob(job);
 	}
 
-	private updateStatus(name: string, key: 'locked' | 'running', number: -1 | 1) {
+	private updateStatus(
+		name: string,
+		key: 'locked' | 'running' | 'lockLimitReached',
+		number: -1 | 1
+	) {
 		if (!this.jobStatus[name]) {
 			this.jobStatus[name] = {
 				locked: 0,

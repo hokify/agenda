@@ -20,6 +20,7 @@ export interface IAgendaStatus {
 	};
 	internal: {
 		localQueueProcessing: number;
+    localLockLimitReached: number;
 	};
 	jobStatus?: IAgendaJobStatus;
 	queuedJobs: number | IJobParameters[];
