@@ -56,7 +56,7 @@
     "debug": "~4",
     "human-interval": "~2",
     "luxon": "^3",
-    "mongodb": "^4"
+    "mongodb": "^5"
   },
   "devDependencies": {
     "eslint": "^8.29.0",
