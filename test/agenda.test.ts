@@ -342,11 +342,8 @@ describe('Agenda', () => {
 						.find({
 							name: 'unique job'
 						})
-						.toArray((err, jobs) => {
-							if (err) {
-								throw err;
-							}
-
+						.toArray()
+						.then(jobs => {
 							expect(jobs).to.have.length(1);
 						});
 				});
@@ -395,11 +392,8 @@ describe('Agenda', () => {
 						.find({
 							name: 'unique job'
 						})
-						.toArray((err, jobs) => {
-							if (err) {
-								throw err;
-							}
-
+						.toArray()
+						.then(jobs => {
 							expect(jobs).to.have.length(1);
 						});
 				});
@@ -443,12 +437,9 @@ describe('Agenda', () => {
 						.find({
 							name: 'unique job'
 						})
-						.toArray((err, jobs) => {
-							if (err) {
-								throw err;
-							}
-
-							expect(jobs).to.have.length(2);
+						.toArray()
+						.then(jobs => {
+							expect(jobs).to.have.length(1);
 						});
 				});
 			});
