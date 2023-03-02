@@ -1,4 +1,4 @@
-name: Run Test
+name: Generate Documentation
 on: [push, workflow_dispatch]
 
 jobs:
