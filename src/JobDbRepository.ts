@@ -248,14 +248,14 @@ export class JobDbRepository {
 	async saveJobState(job: Job<any>): Promise<void> {
 		const id = job.attrs._id;
 		const $set = {
-			lockedAt: (job.attrs.lockedAt && new Date(job.attrs.lockedAt)) || undefined,
-			nextRunAt: (job.attrs.nextRunAt && new Date(job.attrs.nextRunAt)) || undefined,
-			lastRunAt: (job.attrs.lastRunAt && new Date(job.attrs.lastRunAt)) || undefined,
+			lockedAt: (job.attrs.lockedAt && new Date(job.attrs.lockedAt)) || null,
+			nextRunAt: (job.attrs.nextRunAt && new Date(job.attrs.nextRunAt)) || null,
+			lastRunAt: (job.attrs.lastRunAt && new Date(job.attrs.lastRunAt)) || null,
 			progress: job.attrs.progress,
 			failReason: job.attrs.failReason,
 			failCount: job.attrs.failCount,
 			failedAt: job.attrs.failedAt && new Date(job.attrs.failedAt),
-			lastFinishedAt: (job.attrs.lastFinishedAt && new Date(job.attrs.lastFinishedAt)) || undefined
+			lastFinishedAt: (job.attrs.lastFinishedAt && new Date(job.attrs.lastFinishedAt)) || null
 		};
 
 		log('[job %s] save job state: \n%O', id, $set);
