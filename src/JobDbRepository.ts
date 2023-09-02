@@ -3,7 +3,7 @@ import {
 	Collection,
 	Db,
 	Filter,
-	FindOneAndUpdateOptions,
+	FindOneAndUpdateOptions as FindOneAndUpdateOptions_orig,
 	MongoClient,
 	MongoClientOptions,
 	ObjectId,
@@ -17,6 +17,10 @@ import type { IJobParameters } from './types/JobParameters';
 import { hasMongoProtocol } from './utils/hasMongoProtocol';
 
 const log = debug('agenda:db');
+
+interface FindOneAndUpdateOptions extends FindOneAndUpdateOptions_orig {
+  includeResultMetadata: boolean; // support mongodb driver 6.0
+}
 
 const findOneAndUpdateCommonOptions = {
     includeResultMetadata: true, // mongodb driver 6.0 default is false, so we use true for backwards compatibility
