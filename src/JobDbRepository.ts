@@ -3,7 +3,7 @@ import {
 	Collection,
 	Db,
 	Filter,
-	FindOneAndUpdateOptions,
+	FindOneAndUpdateOptions as FindOneAndUpdateOptions_orig,
 	MongoClient,
 	MongoClientOptions,
 	ObjectId,
@@ -17,6 +17,15 @@ import type { IJobParameters } from './types/JobParameters';
 import { hasMongoProtocol } from './utils/hasMongoProtocol';
 
 const log = debug('agenda:db');
+
+interface FindOneAndUpdateOptions extends FindOneAndUpdateOptions_orig {
+  includeResultMetadata: boolean; // support mongodb driver 6.0
+}
+
+const findOneAndUpdateCommonOptions = {
+    includeResultMetadata: true, // mongodb driver 6.0 default is false, so we use true for backwards compatibility
+    returnDocument: 'after'
+} as FindOneAndUpdateOptions;
 
 /**
  * @class
@@ -107,8 +116,8 @@ export class JobDbRepository {
 		// Update / options for the MongoDB query
 		const update: UpdateFilter<IJobParameters> = { $set: { lockedAt: new Date() } };
 		const options: FindOneAndUpdateOptions = {
-			returnDocument: 'after',
-			sort: this.connectOptions.sort
+			sort: this.connectOptions.sort,
+      ...findOneAndUpdateCommonOptions
 		};
 
 		// Lock the job in MongoDB!
@@ -154,8 +163,8 @@ export class JobDbRepository {
 		 * Query used to affect what gets returned
 		 */
 		const JOB_RETURN_QUERY: FindOneAndUpdateOptions = {
-			returnDocument: 'after',
-			sort: this.connectOptions.sort
+			sort: this.connectOptions.sort,
+      ...findOneAndUpdateCommonOptions
 		};
 
 		// Find ONE and ONLY ONE job and set the 'lockedAt' time so that job begins to be processed
@@ -313,7 +322,7 @@ export class JobDbRepository {
 				const result = await this.collection.findOneAndUpdate(
 					{ _id: id, name: props.name },
 					update,
-					{ returnDocument: 'after' }
+					{ ...findOneAndUpdateCommonOptions }
 				);
 				return this.processDbResult(job, result.value as IJobParameters<DATA>);
 			}
@@ -352,7 +361,7 @@ export class JobDbRepository {
 					update,
 					{
 						upsert: true,
-						returnDocument: 'after'
+						...findOneAndUpdateCommonOptions
 					}
 				);
 				log(
