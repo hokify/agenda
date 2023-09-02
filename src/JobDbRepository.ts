@@ -25,7 +25,7 @@ interface FindOneAndUpdateOptions extends FindOneAndUpdateOptions_orig {
 const findOneAndUpdateCommonOptions = {
     includeResultMetadata: true, // mongodb driver 6.0 default is false, so we use true for backwards compatibility
     returnDocument: 'after'
-};
+} as FindOneAndUpdateOptions;
 
 /**
  * @class
