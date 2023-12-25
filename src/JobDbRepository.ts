@@ -105,7 +105,7 @@ export class JobDbRepository {
 		};
 
 		// Update / options for the MongoDB query
-		const update: UpdateFilter<IJobParameters> = { $set: { lockedAt: new Date() } };
+		const update: UpdateFilter<IJobParameters> = { $set: { lockedAt: new Date(), lastModifiedBy: this.agenda.attrs.name } };
 		const options: FindOneAndUpdateOptions = {
 			returnDocument: 'after',
 			sort: this.connectOptions.sort
@@ -148,7 +148,7 @@ export class JobDbRepository {
 		/**
 		 * Query used to set a job as locked
 		 */
-		const JOB_PROCESS_SET_QUERY: UpdateFilter<IJobParameters> = { $set: { lockedAt: now } };
+		const JOB_PROCESS_SET_QUERY: UpdateFilter<IJobParameters> = { $set: { lockedAt: now, lastModifiedBy: this.agenda.attrs.name } };
 
 		/**
 		 * Query used to affect what gets returned
