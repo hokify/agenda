@@ -11,8 +11,14 @@
 		"strict": true,
 		"noImplicitAny": false,
 		"removeComments": false,
+		"emitDecoratorMetadata": true,
+		"composite": true,
+		"experimentalDecorators": true,
 		"strictPropertyInitialization": false,
+		"resolveJsonModule": true,
 		"sourceMap": true,
+		"isolatedModules": false,
+		"declaration": true
 	},
 	"exclude": ["node_modules", "**/__tests__"],
 	"include": ["./src"]
