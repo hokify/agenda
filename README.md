@@ -1,9 +1,14 @@
 **DISCLAIMER**: I **do not** intend to actively maintain this repository.
-I forked it from https://github.com/hokify/agenda because I desperately needed support for [mongodb@6](https://www.npmjs.com/package/mongodb) for my website www.whisthub.com, but the original repository doesn't seem very active anymore.
-Ideally this gets merged back into [@hokify/agenda](https://github.com/hokify/agenda), or even better in [agenda/agenda](https://github.com/agenda/agenda).
+I forked it from https://github.com/hokify/agenda because I desperately needed support for [mongodb@6](https://www.npmjs.com/package/mongodb) for my website www.whisthub.com, and tailored it to my own needs.
+Ideally this gets merged back eventuallyinto [@hokify/agenda](https://github.com/hokify/agenda), or even better in [agenda/agenda](https://github.com/agenda/agenda).
 
 However, I *do* intend to keep this up to date with the latest version of the [mongodb](https://www.npmjs.com/package/mongodb) package, but that's all.
 Agenda is a great library and I would hate to see it dying because new mongodb versions are not supported.
+
+Key differences with the [original repo](https://github.com/hokify/agenda) are: 
+
+ - MongoDB is now a peer dependency, so it must be installed separately.
+ - The library is only tested against version 6, but it should work for version 5 and even 4.
 
 # Agenda
 
