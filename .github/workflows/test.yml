@@ -7,8 +7,7 @@ jobs:
     strategy:
       matrix:
         node-version: [18, 20, 21]
-        mongodb-version: [3.6, 4.4, 5.0, 6.0, 7.0]
-        mongodb-client: [4, 5, 6]
+        mongodb-version: [6.0, 7.0]
     steps:
       - name: Git checkout
         uses: actions/checkout@v4
@@ -34,9 +33,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-agenda-
 
-      - name: Update npm
-        run: npm -g install npm@latest
-
       - name: Install Packages
         run: npm install
 
@@ -52,4 +48,3 @@ jobs:
         run: npm run test
         env:
           CI: true
-          MONGODB_CLIENT_VERSION: ${{ matrix.mongodb-client }}
