@@ -1,5 +1,5 @@
-import type { IJobParameters } from './JobParameters';
-import type { IJobDefinition } from './JobDefinition';
+import type { IJobParameters } from './JobParameters.js';
+import type { IJobDefinition } from './JobDefinition.js';
 
 export interface IAgendaJobStatus {
 	[name: string]: {
@@ -20,7 +20,7 @@ export interface IAgendaStatus {
 	};
 	internal: {
 		localQueueProcessing: number;
-    localLockLimitReached: number;
+		localLockLimitReached: number;
 	};
 	jobStatus?: IAgendaJobStatus;
 	queuedJobs: number | IJobParameters[];

@@ -1,14 +1,16 @@
-import * as debug from 'debug';
-import type { IAgendaJobStatus, IAgendaStatus } from './types/AgendaStatus';
-import type { IJobDefinition } from './types/JobDefinition';
-import type { Agenda, JobWithId } from './index';
-import type { IJobParameters } from './types/JobParameters';
-import { Job } from './Job';
-import { JobProcessingQueue } from './JobProcessingQueue';
+import debug from 'debug';
+import { createRequire } from 'node:module';
+import type { IAgendaJobStatus, IAgendaStatus } from './types/AgendaStatus.js';
+import type { IJobDefinition } from './types/JobDefinition.js';
+import type { Agenda, JobWithId } from './index.js';
+import type { IJobParameters } from './types/JobParameters.js';
+import { Job } from './Job.js';
+import { JobProcessingQueue } from './JobProcessingQueue.js';
 
 const log = debug('agenda:jobProcessor');
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires,global-require
+const require = createRequire(import.meta.url);
 const { version: agendaVersion } = require('../package.json');
 
 const MAX_SAFE_32BIT_INTEGER = 2 ** 31; // Math.pow(2,31);
@@ -79,7 +81,7 @@ export class JobProcessor {
 
 	private nextScanAt = new Date();
 
-	private jobQueue: JobProcessingQueue = new JobProcessingQueue(this.agenda);
+	private jobQueue: JobProcessingQueue;
 
 	private runningJobs: JobWithId[] = [];
 
@@ -101,6 +103,7 @@ export class JobProcessor {
 		private totalLockLimit: number,
 		private processEvery: number
 	) {
+		this.jobQueue = new JobProcessingQueue(this.agenda);
 		log('creating interval to call processJobs every [%dms]', processEvery);
 		this.processInterval = setInterval(() => this.process(), processEvery);
 		this.process();

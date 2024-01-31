@@ -1,8 +1,9 @@
 {
-  "name": "@hokify/agenda",
-  "version": "6.3.0",
+  "name": "@whisthub/agenda",
+  "version": "0.0.0",
+  "type": "module",
   "description": "Light weight job scheduler for Node.js",
-  "main": "dist/index.js",
+  "exports": "./dist/index.js",
   "types": "dist/index.d.ts",
   "publishConfig": {
     "access": "public"
@@ -11,7 +12,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=18.0.0"
   },
   "scripts": {
     "release": "npm run build && standard-version",
@@ -35,7 +36,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/hokify/agenda"
+    "url": "git://github.com/whisthub/agenda"
   },
   "keywords": [
     "job",
@@ -45,22 +46,22 @@
     "scheduler",
     "runner"
   ],
-  "author": "Simon Tretter <simon.tretter@hokify.com>",
+  "author": "Sebastiaan Marynissen <info@whisthub.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hokify/agenda/issues"
+    "url": "https://github.com/whisthub/agenda/issues"
   },
   "dependencies": {
     "cron-parser": "^4",
     "date.js": "~0.3.3",
     "debug": "~4",
     "human-interval": "~2",
-    "luxon": "^3",
-    "mongodb": "^4"
+    "luxon": "^3"
+  },
+  "peerDependencies": {
+    "mongodb": ">=4"
   },
   "devDependencies": {
-    "eslint": "^8.29.0",
-    "prettier": "^2.8.1",
     "@hokify/eslint-config": "^2.3.8",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/chai": "^4.3.4",
@@ -71,13 +72,17 @@
     "@types/node": "^18.11.12",
     "@types/sinon": "^10.0.13",
     "chai": "^4.3.7",
-    "delay": "5.0.0",
+    "delay": "^6.0.0",
+    "eslint": "^8.29.0",
     "mocha": "10.1.0",
-    "mongodb-memory-server": "^8.10.1",
+    "mongodb": "^6.3.0",
+    "mongodb-memory-server": "^9.1.6",
     "nyc": "^15.1.0",
+    "prettier": "^2.8.1",
     "sinon": "15.0.0",
     "standard-version": "^9.5.0",
     "ts-node": "^10.9.1",
+    "tsx": "^4.7.0",
     "typedoc": "^0.23.21",
     "typescript": "^4.9.4"
   }
