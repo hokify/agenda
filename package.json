@@ -15,9 +15,10 @@
   },
   "scripts": {
     "release": "npm run build && standard-version",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm uninstall mongodb && npm run build",
     "build": "tsc",
     "test": "npm run mocha",
+    "test:ci": "npm run mocha && npm uninstall mongodb",
     "lint": "eslint src",
     "lint-fix": "eslint src --fix",
     "mocha": "mocha --reporter spec -b",
@@ -55,8 +56,7 @@
     "date.js": "~0.3.3",
     "debug": "~4",
     "human-interval": "~2",
-    "luxon": "^3",
-    "mongodb": "^6.3.0"
+    "luxon": "^3"
   },
   "devDependencies": {
     "@hokify/eslint-config": "^2.3.8",
@@ -72,8 +72,6 @@
     "delay": "5.0.0",
     "eslint": "^8.29.0",
     "mocha": "10.1.0",
-    "mongodb-five": "npm:mongodb@^5.9.2",
-    "mongodb-four": "npm:mongodb@^4.17.2",
     "mongodb-memory-server": "^9.1.6",
     "nyc": "^15.1.0",
     "prettier": "^2.8.1",

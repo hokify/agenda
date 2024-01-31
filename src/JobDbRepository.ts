@@ -7,7 +7,8 @@ import {
 	MongoClientOptions,
 	ObjectId,
 	Sort,
-	UpdateFilter
+	UpdateFilter,
+	ModifyResult
 } from 'mongodb';
 import type { Job, JobWithId } from './Job';
 import type { Agenda } from './index';
@@ -107,6 +108,7 @@ export class JobDbRepository {
 		const update: UpdateFilter<IJobParameters> = { $set: { lockedAt: new Date() } };
 
 		// Lock the job in MongoDB!
+		// @ts-ignore
 		const resp = await this.collection.findOneAndUpdate(
 			criteria as Filter<IJobParameters>,
 			update,
@@ -115,7 +117,7 @@ export class JobDbRepository {
 				sort: this.connectOptions.sort,
 				includeResultMetadata: true
 			}
-		);
+		) as any;
 
 		return resp?.value || undefined;
 	}
@@ -150,6 +152,7 @@ export class JobDbRepository {
 		const JOB_PROCESS_SET_QUERY: UpdateFilter<IJobParameters> = { $set: { lockedAt: now } };
 
 		// Find ONE and ONLY ONE job and set the 'lockedAt' time so that job begins to be processed
+		// @ts-ignore
 		const result = await this.collection.findOneAndUpdate(
 			JOB_PROCESS_WHERE_QUERY,
 			JOB_PROCESS_SET_QUERY,
@@ -158,7 +161,7 @@ export class JobDbRepository {
 				sort: this.connectOptions.sort,
 				includeResultMetadata: true
 			}
-		);
+		) as any;
 
 		return result.value || undefined;
 	}
@@ -305,6 +308,7 @@ export class JobDbRepository {
 			if (id) {
 				// Update the job and process the resulting data'
 				log('job already has _id, calling findOneAndUpdate() using _id as query');
+				// @ts-ignore
 				const result = await this.collection.findOneAndUpdate(
 					{ _id: id, name: props.name },
 					update,
@@ -312,7 +316,7 @@ export class JobDbRepository {
 						returnDocument: 'after',
 						includeResultMetadata: true
 					}
-				);
+				) as any;
 				return this.processDbResult(job, result.value as IJobParameters<DATA>);
 			}
 
@@ -342,6 +346,7 @@ export class JobDbRepository {
 					})
 				);
 				// this call ensure a job of this name can only exists once
+				// @ts-ignore
 				const result = await this.collection.findOneAndUpdate(
 					{
 						name: props.name,
@@ -353,7 +358,7 @@ export class JobDbRepository {
 						returnDocument: 'after',
 						includeResultMetadata: true
 					}
-				);
+				) as any;
 				log(
 					`findOneAndUpdate(${props.name}) with type "single" ${
 						result.lastErrorObject?.updatedExisting
@@ -374,11 +379,12 @@ export class JobDbRepository {
 
 				// Use the 'unique' query object to find an existing job or create a new one
 				log('calling findOneAndUpdate() with unique object as query: \n%O', query);
+				// @ts-ignore
 				const result = await this.collection.findOneAndUpdate(query as IJobParameters, update, {
 					upsert: true,
 					returnDocument: 'after',
 					includeResultMetadata: true
-				});
+				}) as any;
 				return this.processDbResult(job, result.value as IJobParameters<DATA>);
 			}
 

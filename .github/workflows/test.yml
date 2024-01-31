@@ -8,7 +8,7 @@ jobs:
       matrix:
         node-version: [18, 20, 21]
         mongodb-version: [6.0, 7.0]
-        mongodb-client: [5, 6]
+        mongodb-client: [4, 5, 6]
     steps:
       - name: Git checkout
         uses: actions/checkout@v4
@@ -45,8 +45,10 @@ jobs:
         env:
           CI: true
 
+      - name: Install peer depedencies
+        run: npm i mongodb@${{ matrix.mongodb-client }}
+
       - name: Test
-        run: npm run test
+        run: npm run test:ci
         env:
           CI: true
-          MONGODB_CLIENT_VERSION: ${{ matrix.mongodb-client }}
