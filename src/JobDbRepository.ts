@@ -108,7 +108,9 @@ export class JobDbRepository {
 		const update: UpdateFilter<IJobParameters> = { $set: { lockedAt: new Date() } };
 		const options: FindOneAndUpdateOptions = {
 			returnDocument: 'after',
-			sort: this.connectOptions.sort
+			sort: this.connectOptions.sort,
+			// @ts-ignore
+			includeResultMetadata: true,
 		};
 
 		// Lock the job in MongoDB!
@@ -155,7 +157,9 @@ export class JobDbRepository {
 		 */
 		const JOB_RETURN_QUERY: FindOneAndUpdateOptions = {
 			returnDocument: 'after',
-			sort: this.connectOptions.sort
+			sort: this.connectOptions.sort,
+			// @ts-ignore
+			includeResultMetadata: true
 		};
 
 		// Find ONE and ONLY ONE job and set the 'lockedAt' time so that job begins to be processed
@@ -310,10 +314,15 @@ export class JobDbRepository {
 			if (id) {
 				// Update the job and process the resulting data'
 				log('job already has _id, calling findOneAndUpdate() using _id as query');
+				const options: FindOneAndUpdateOptions = {
+					returnDocument: 'after',
+					// @ts-ignore
+					includeResultMetadata: true
+				};
 				const result = await this.collection.findOneAndUpdate(
 					{ _id: id, name: props.name },
 					update,
-					{ returnDocument: 'after' }
+					options
 				);
 				return this.processDbResult(job, result.value as IJobParameters<DATA>);
 			}
@@ -344,16 +353,19 @@ export class JobDbRepository {
 					})
 				);
 				// this call ensure a job of this name can only exists once
+				const options: FindOneAndUpdateOptions = {
+					upsert: true,
+					returnDocument: 'after',
+					// @ts-ignore
+					includeResultMetadata: true,
+				};
 				const result = await this.collection.findOneAndUpdate(
 					{
 						name: props.name,
 						type: 'single'
 					},
 					update,
-					{
-						upsert: true,
-						returnDocument: 'after'
-					}
+					options,
 				);
 				log(
 					`findOneAndUpdate(${props.name}) with type "single" ${
@@ -375,10 +387,13 @@ export class JobDbRepository {
 
 				// Use the 'unique' query object to find an existing job or create a new one
 				log('calling findOneAndUpdate() with unique object as query: \n%O', query);
-				const result = await this.collection.findOneAndUpdate(query as IJobParameters, update, {
+				const options: FindOneAndUpdateOptions = {
 					upsert: true,
-					returnDocument: 'after'
-				});
+					returnDocument: 'after',
+					// @ts-ignore
+					includeResultMetadata: true,
+				};
+				const result = await this.collection.findOneAndUpdate(query as IJobParameters, update, options);
 				return this.processDbResult(job, result.value as IJobParameters<DATA>);
 			}
 
