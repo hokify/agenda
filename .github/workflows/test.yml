@@ -35,7 +35,7 @@ jobs:
             ${{ runner.os }}-build-agenda-
 
       - name: Install Packages
-        run: npm install
+        run: npm ci
 
       - name: Run Lint
         run: npm run lint
