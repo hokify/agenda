@@ -3,7 +3,6 @@ import {
 	Collection,
 	Db,
 	Filter,
-	FindOneAndUpdateOptions,
 	MongoClient,
 	MongoClientOptions,
 	ObjectId,
