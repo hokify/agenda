@@ -4,22 +4,15 @@
 		"rootDir": "./src",
 		"module": "nodenext",
 		"moduleDetection": "force",
-		"target": "es2017",
-		// "lib": ["es2017"],
+		"target": "es2022",
 
 		// other best practice configs
 		"moduleResolution": "nodenext",
 		"strict": true,
-		"noImplicitAny": false, // <-- get rid of this!
-		"removeComments": false, // <-- do not remove comments (needed for @deprecated notices etc)
-		"emitDecoratorMetadata": true,
-		"composite": true,
-		"experimentalDecorators": true,
+		"noImplicitAny": false,
+		"removeComments": false,
 		"strictPropertyInitialization": false,
-		"resolveJsonModule": true,
 		"sourceMap": true,
-		"isolatedModules": false,
-		"declaration": true
 	},
 	"exclude": ["node_modules", "**/__tests__"],
 	"include": ["./src"]
