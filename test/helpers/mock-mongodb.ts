@@ -13,11 +13,7 @@ export interface IMockMongo {
 
 export async function mockMongo(): Promise<IMockMongo> {
 	const self: IMockMongo = {} as any;
-	self.mongod = await MongoMemoryServer.create({
-		binary: {
-			version: process.env.MONGODB_VERSION,
-		},
-	});
+	self.mongod = await MongoMemoryServer.create();
 	const uri = self.mongod.getUri();
 	log('mongod started', uri);
 	self.mongo = await MongoClient.connect(uri);
