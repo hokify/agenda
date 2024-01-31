@@ -1,7 +1,7 @@
 {
 	"diff": true,
-	"spec": "./test/*.test.ts",
-	"require": ["ts-node/register", "source-map-support/register"],
+	"spec": "*.test.ts",
+	"import": ["tsx/esm"],
 	"extension": ["js", "ts"],
 	"package": "./package.json",
 	"recursive": true,

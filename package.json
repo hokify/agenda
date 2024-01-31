@@ -1,8 +1,9 @@
 {
   "name": "@whisthub/agenda",
   "version": "0.0.0",
+  "type": "module",
   "description": "Light weight job scheduler for Node.js",
-  "main": "dist/index.js",
+  "exports": "./dist/index.js",
   "types": "dist/index.d.ts",
   "publishConfig": {
     "access": "public"
@@ -71,7 +72,7 @@
     "@types/node": "^18.11.12",
     "@types/sinon": "^10.0.13",
     "chai": "^4.3.7",
-    "delay": "5.0.0",
+    "delay": "^6.0.0",
     "eslint": "^8.29.0",
     "mocha": "10.1.0",
     "mongodb": "^6.3.0",
@@ -81,6 +82,7 @@
     "sinon": "15.0.0",
     "standard-version": "^9.5.0",
     "ts-node": "^10.9.1",
+    "tsx": "^4.7.0",
     "typedoc": "^0.23.21",
     "typescript": "^4.9.4"
   }

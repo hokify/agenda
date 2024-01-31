@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { Db } from 'mongodb';
-import * as delay from 'delay';
+import delay from 'delay';
 import { mockMongo } from './helpers/mock-mongodb';
 
 import { Agenda } from '../src';

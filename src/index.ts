@@ -1,20 +1,20 @@
 import { EventEmitter } from 'events';
-import * as debug from 'debug';
+import debug from 'debug';
 
 import type { Db, Filter, MongoClientOptions, Sort } from 'mongodb';
 import { SortDirection } from 'mongodb';
 import { ForkOptions } from 'child_process';
-import type { IJobDefinition } from './types/JobDefinition';
-import type { IAgendaConfig } from './types/AgendaConfig';
-import type { IDatabaseOptions, IDbConfig, IMongoOptions } from './types/DbOptions';
-import type { IAgendaStatus } from './types/AgendaStatus';
-import type { IJobParameters } from './types/JobParameters';
-import { Job, JobWithId } from './Job';
-import { JobDbRepository } from './JobDbRepository';
-import { JobPriority, parsePriority } from './utils/priority';
-import { JobProcessor } from './JobProcessor';
-import { calculateProcessEvery } from './utils/processEvery';
-import { getCallerFilePath } from './utils/stack';
+import type { IJobDefinition } from './types/JobDefinition.js';
+import type { IAgendaConfig } from './types/AgendaConfig.js';
+import type { IDatabaseOptions, IDbConfig, IMongoOptions } from './types/DbOptions.js';
+import type { IAgendaStatus } from './types/AgendaStatus.js';
+import type { IJobParameters } from './types/JobParameters.js';
+import { Job, JobWithId } from './Job.js';
+import { JobDbRepository } from './JobDbRepository.js';
+import { JobPriority, parsePriority } from './utils/priority.js';
+import { JobProcessor } from './JobProcessor.js';
+import { calculateProcessEvery } from './utils/processEvery.js';
+import { getCallerFilePath } from './utils/stack.js';
 
 const log = debug('agenda');
 
@@ -571,12 +571,12 @@ export class Agenda extends EventEmitter {
 	}
 }
 
-export * from './types/AgendaConfig';
+export * from './types/AgendaConfig.js';
 
-export * from './types/JobDefinition';
+export * from './types/JobDefinition.js';
 
-export * from './types/JobParameters';
+export * from './types/JobParameters.js';
 
-export * from './types/DbOptions';
+export * from './types/DbOptions.js';
 
-export * from './Job';
+export * from './Job.js';

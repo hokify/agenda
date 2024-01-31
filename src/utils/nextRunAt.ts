@@ -1,11 +1,12 @@
 /* eslint-disable import/first */
 import { DateTime } from 'luxon';
-import * as date from 'date.js';
-import * as debug from 'debug';
-import { parseExpression } from 'cron-parser';
-import humanInterval = require('human-interval');
-import { isValidDate } from './isValidDate';
-import type { IJobParameters } from '../types/JobParameters';
+import date from 'date.js';
+import debug from 'debug';
+import cronParser from 'cron-parser';
+import humanInterval from 'human-interval';
+import { isValidDate } from './isValidDate.js';
+import type { IJobParameters } from '../types/JobParameters.js';
+const { parseExpression } = cronParser;
 
 const log = debug('agenda:nextRunAt');
 

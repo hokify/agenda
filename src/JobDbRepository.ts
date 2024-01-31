@@ -1,4 +1,4 @@
-import * as debug from 'debug';
+import debug from 'debug';
 import {
 	Collection,
 	Db,
@@ -9,11 +9,11 @@ import {
 	Sort,
 	UpdateFilter
 } from 'mongodb';
-import type { Job, JobWithId } from './Job';
-import type { Agenda } from './index';
-import type { IDatabaseOptions, IDbConfig, IMongoOptions } from './types/DbOptions';
-import type { IJobParameters } from './types/JobParameters';
-import { hasMongoProtocol } from './utils/hasMongoProtocol';
+import type { Job, JobWithId } from './Job.js';
+import type { Agenda } from './index.js';
+import type { IDatabaseOptions, IDbConfig, IMongoOptions } from './types/DbOptions.js';
+import type { IJobParameters } from './types/JobParameters.js';
+import { hasMongoProtocol } from './utils/hasMongoProtocol.js';
 
 const log = debug('agenda:db');
 

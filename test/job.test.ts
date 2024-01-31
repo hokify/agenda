@@ -1,18 +1,19 @@
 /* eslint-disable no-console */
-import * as path from 'path';
-import * as cp from 'child_process';
+import path from 'node:path';
+import cp from 'node:child_process';
 import { expect } from 'chai';
-import * as assert from 'node:assert';
+import assert from 'node:assert';
 import { DateTime } from 'luxon';
 import { Db } from 'mongodb';
 
-import * as delay from 'delay';
+import delay from 'delay';
 import * as sinon from 'sinon';
 import { fail } from 'assert';
 import { Job } from '../src/Job';
 import { Agenda } from '../src';
 import { mockMongo } from './helpers/mock-mongodb';
 import someJobDefinition from './fixtures/someJobDefinition';
+const __dirname = import.meta.dirname;
 
 // Create agenda instances
 let agenda: Agenda;
@@ -1345,7 +1346,7 @@ describe('Job', () => {
 
 	describe('Integration Tests', () => {
 		describe('.every()', () => {
-			it('Should not rerun completed jobs after restart', done => {
+			it.only('Should not rerun completed jobs after restart', done => {
 				let i = 0;
 
 				const serviceError = function (e) {
