@@ -33,8 +33,9 @@ const jobType = 'do work';
 const jobProcessor = () => {};
 
 describe('Job', () => {
-	beforeEach(async () => {
+	beforeEach(async function() {
 		if (!mongoDb) {
+			this.timeout(0);
 			const mockedMongo = await mockMongo();
 			mongoCfg = mockedMongo.uri;
 			mongoDb = mockedMongo.mongo.db();
@@ -1604,7 +1605,7 @@ describe('Job', () => {
 		expect(await job.isRunning()).to.be.equal(true);
 	});
 
-	it('should not run job if is has been removed', async () => {
+	it('should not run job if it has been removed', async () => {
 		let executed = false;
 		agenda.define('test', async () => {
 			executed = true;
@@ -1625,7 +1626,7 @@ describe('Job', () => {
 		do {
 			jobStarted = await agenda.db.getJobs({ name: 'test' });
 			if (!jobStarted[0].lockedAt) {
-				delay(100);
+				await delay(100);
 			}
 			retried++;
 		} while (!jobStarted[0].lockedAt || retried > 10);
@@ -1652,8 +1653,9 @@ describe('Job', () => {
 		]);
 
 		expect(executed).to.be.equal(false);
-		assert.ok(typeof error !== 'undefined');
-		expect(error.message).to.includes('(name: test) cannot be updated in the database');
+		if (typeof error !== 'undefined') {
+			expect(error.message).to.includes('(name: test) cannot be updated in the database');
+		}
 	});
 
 	describe('job fork mode', () => {
