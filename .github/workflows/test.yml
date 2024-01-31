@@ -40,9 +40,6 @@ jobs:
       - name: Install Packages
         run: npm install
 
-      - name: Install MongoDB client
-        run: npm install mongodb@${{ matrix.mongodb-client }}
-
       - name: Run Lint
         run: npm run lint
 
