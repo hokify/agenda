@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import cp from 'node:child_process';
 import { expect } from 'chai';
 import assert from 'node:assert';
@@ -9,11 +10,11 @@ import { Db } from 'mongodb';
 import delay from 'delay';
 import * as sinon from 'sinon';
 import { fail } from 'assert';
-import { Job } from '../src/Job';
-import { Agenda } from '../src';
-import { mockMongo } from './helpers/mock-mongodb';
-import someJobDefinition from './fixtures/someJobDefinition';
-const __dirname = import.meta.dirname;
+import { Job } from '../src/Job.js';
+import { Agenda } from '../src/index.js';
+import { mockMongo } from './helpers/mock-mongodb.js';
+import someJobDefinition from './fixtures/someJobDefinition.js';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Create agenda instances
 let agenda: Agenda;

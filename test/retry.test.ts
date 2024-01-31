@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 import { Db } from 'mongodb';
 import delay from 'delay';
-import { mockMongo } from './helpers/mock-mongodb';
+import { mockMongo } from './helpers/mock-mongodb.js';
 
-import { Agenda } from '../src';
+import { Agenda } from '../src/index.js';
 
 // agenda instances
 let agenda: Agenda;
