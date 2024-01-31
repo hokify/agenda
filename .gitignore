@@ -12,3 +12,4 @@ docs/agenda/*
 dist
 .nyc_output
 coverage
+*.tsbuildinfo
