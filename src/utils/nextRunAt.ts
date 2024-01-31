@@ -6,6 +6,7 @@ import cronParser from 'cron-parser';
 import humanInterval from 'human-interval';
 import { isValidDate } from './isValidDate.js';
 import type { IJobParameters } from '../types/JobParameters.js';
+
 const { parseExpression } = cronParser;
 
 const log = debug('agenda:nextRunAt');

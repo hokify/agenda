@@ -1,11 +1,11 @@
 import debug from 'debug';
+import { createRequire } from 'node:module';
 import type { IAgendaJobStatus, IAgendaStatus } from './types/AgendaStatus.js';
 import type { IJobDefinition } from './types/JobDefinition.js';
 import type { Agenda, JobWithId } from './index.js';
 import type { IJobParameters } from './types/JobParameters.js';
 import { Job } from './Job.js';
 import { JobProcessingQueue } from './JobProcessingQueue.js';
-import { createRequire } from 'node:module';
 
 const log = debug('agenda:jobProcessor');
 
