@@ -6,8 +6,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [14, 16, 18]
-        mongodb-version: [3.6, 4.4, 5.0]
+        node-version: [18, 20, 21]
+        mongodb-version: [3.6, 4.4, 5.0, 6.0, 7.0]
+        mongodb-client: [4, 5, 6]
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
@@ -16,11 +17,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-
-      - name: Start MongoDB
-        uses: supercharge/mongodb-github-action@1.6.0
-        with:
-          mongodb-version: ${{ matrix.mongodb-version }}
 
       - name: Cache node modules
         uses: actions/cache@v2
@@ -39,6 +35,9 @@ jobs:
       - name: Install Packages
         run: npm install
 
+      - name: Install MongoDB client
+        run: npm install mongodb@${{ matrix.mongodb-client }}
+
       - name: Run Lint
         run: npm run lint
 
@@ -51,3 +50,4 @@ jobs:
         run: npm run test
         env:
           CI: true
+          MONGODB_VERSION: ${{ matrix.mongodb-version }}
