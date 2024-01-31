@@ -6,12 +6,6 @@ module.exports = {
 	},
   overrides: [
     {
-      files: ['*ts'],
-      rules: {
-        '@typescript-eslint/ban-ts-comment': 'off',
-      },
-    },
-    {
       files: ['*.test.ts'],
       env: {
         mocha: true
