@@ -114,7 +114,7 @@ export class JobDbRepository {
 			{
 				returnDocument: 'after',
 				sort: this.connectOptions.sort,
-				includeResultMetadata: true,
+				includeResultMetadata: true
 			}
 		);
 
@@ -157,8 +157,8 @@ export class JobDbRepository {
 			{
 				returnDocument: 'after',
 				sort: this.connectOptions.sort,
-				includeResultMetadata: true,
-			},
+				includeResultMetadata: true
+			}
 		);
 
 		return result.value || undefined;
@@ -312,7 +312,7 @@ export class JobDbRepository {
 					{
 						returnDocument: 'after',
 						includeResultMetadata: true
-					},
+					}
 				);
 				return this.processDbResult(job, result.value as IJobParameters<DATA>);
 			}
@@ -352,8 +352,8 @@ export class JobDbRepository {
 					{
 						upsert: true,
 						returnDocument: 'after',
-						includeResultMetadata: true,
-					},
+						includeResultMetadata: true
+					}
 				);
 				log(
 					`findOneAndUpdate(${props.name}) with type "single" ${
@@ -378,7 +378,7 @@ export class JobDbRepository {
 				const result = await this.collection.findOneAndUpdate(query as IJobParameters, update, {
 					upsert: true,
 					returnDocument: 'after',
-					includeResultMetadata: true,
+					includeResultMetadata: true
 				});
 				return this.processDbResult(job, result.value as IJobParameters<DATA>);
 			}
