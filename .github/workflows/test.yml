@@ -49,6 +49,6 @@ jobs:
         run: npm i mongodb@${{ matrix.mongodb-client }}
 
       - name: Test
-        run: npm run test:ci
+        run: npm test
         env:
           CI: true
