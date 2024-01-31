@@ -1,5 +1,5 @@
 {
-  "name": "@hokify/agenda",
+  "name": "@whisthub/agenda",
   "version": "6.3.0",
   "description": "Light weight job scheduler for Node.js",
   "main": "dist/index.js",
@@ -11,7 +11,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=18.0.0"
   },
   "scripts": {
     "release": "npm run build && standard-version",
@@ -45,10 +45,10 @@
     "scheduler",
     "runner"
   ],
-  "author": "Simon Tretter <simon.tretter@hokify.com>",
+  "author": "Sebastiaan Marynissen <info@whisthub.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hokify/agenda/issues"
+    "url": "https://github.com/whisthub/agenda/issues"
   },
   "dependencies": {
     "cron-parser": "^4",
