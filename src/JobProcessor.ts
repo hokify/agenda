@@ -81,7 +81,7 @@ export class JobProcessor {
 
 	private nextScanAt = new Date();
 
-	private jobQueue: JobProcessingQueue = new JobProcessingQueue(this.agenda);
+	private jobQueue: JobProcessingQueue;
 
 	private runningJobs: JobWithId[] = [];
 
@@ -103,6 +103,7 @@ export class JobProcessor {
 		private totalLockLimit: number,
 		private processEvery: number
 	) {
+		this.jobQueue = new JobProcessingQueue(this.agenda);
 		log('creating interval to call processJobs every [%dms]', processEvery);
 		this.processInterval = setInterval(() => this.process(), processEvery);
 		this.process();

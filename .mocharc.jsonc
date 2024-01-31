@@ -1,6 +1,6 @@
 {
 	"diff": true,
-	"spec": "*.test.ts",
+	"spec": "./test/*.test.ts",
 	"import": ["tsx/esm"],
 	"extension": ["js", "ts"],
 	"package": "./package.json",

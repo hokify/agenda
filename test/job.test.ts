@@ -1346,7 +1346,7 @@ describe('Job', () => {
 
 	describe('Integration Tests', () => {
 		describe('.every()', () => {
-			it.only('Should not rerun completed jobs after restart', done => {
+			it('Should not rerun completed jobs after restart', done => {
 				let i = 0;
 
 				const serviceError = function (e) {
@@ -1370,7 +1370,7 @@ describe('Job', () => {
 				const startService = () => {
 					const serverPath = path.join(__dirname, 'fixtures', 'agenda-instance.ts');
 					const n = cp.fork(serverPath, [mongoCfg, 'daily'], {
-						execArgv: ['-r', 'ts-node/register']
+						execArgv: ['--import', 'tsx/esm']
 					});
 
 					n.on('message', receiveMessage);
@@ -1383,7 +1383,7 @@ describe('Job', () => {
 			it('Should properly run jobs when defined via an array', done => {
 				const serverPath = path.join(__dirname, 'fixtures', 'agenda-instance.ts');
 				const n = cp.fork(serverPath, [mongoCfg, 'daily-array'], {
-					execArgv: ['-r', 'ts-node/register']
+					execArgv: ['--import', 'tsx/esm']
 				});
 
 				let ran1 = false;
@@ -1466,7 +1466,7 @@ describe('Job', () => {
 				const startService = () => {
 					const serverPath = path.join(__dirname, 'fixtures', 'agenda-instance.ts');
 					const n = cp.fork(serverPath, [mongoCfg, 'define-future-job'], {
-						execArgv: ['-r', 'ts-node/register']
+						execArgv: ['--import', 'tsx/esm']
 					});
 
 					n.on('message', receiveMessage);
@@ -1492,7 +1492,7 @@ describe('Job', () => {
 				const startService = () => {
 					const serverPath = path.join(__dirname, 'fixtures', 'agenda-instance.ts');
 					const n = cp.fork(serverPath, [mongoCfg, 'define-past-due-job'], {
-						execArgv: ['-r', 'ts-node/register']
+						execArgv: ['--import', 'tsx/esm']
 					});
 
 					n.on('message', receiveMessage);
@@ -1505,7 +1505,7 @@ describe('Job', () => {
 			it('Should schedule using array of names', done => {
 				const serverPath = path.join(__dirname, 'fixtures', 'agenda-instance.ts');
 				const n = cp.fork(serverPath, [mongoCfg, 'schedule-array'], {
-					execArgv: ['-r', 'ts-node/register']
+					execArgv: ['--import', 'tsx/esm']
 				});
 
 				let ran1 = false;
@@ -1556,7 +1556,7 @@ describe('Job', () => {
 				};
 
 				const serverPath = path.join(__dirname, 'fixtures', 'agenda-instance.ts');
-				const n = cp.fork(serverPath, [mongoCfg, 'now'], { execArgv: ['-r', 'ts-node/register'] });
+				const n = cp.fork(serverPath, [mongoCfg, 'now'], { execArgv: ['--import', 'tsx/esm'] });
 
 				n.on('message', receiveMessage);
 				n.on('error', serviceError);
@@ -1659,7 +1659,7 @@ describe('Job', () => {
 		}
 	});
 
-	describe('job fork mode', () => {
+	describe('job fork mode', () => {7
 		it('runs a job in fork mode', async () => {
 			const agendaFork = new Agenda({
 				mongo: mongoDb,
@@ -1667,7 +1667,7 @@ describe('Job', () => {
 					path: './test/helpers/forkHelper.ts',
 					options: {
 						env: { DB_CONNECTION: mongoCfg },
-						execArgv: ['-r', 'ts-node/register']
+						execArgv: ['--import', 'tsx/esm']
 					}
 				}
 			});
@@ -1710,7 +1710,7 @@ describe('Job', () => {
 					path: './test/helpers/forkHelper.ts',
 					options: {
 						env: { DB_CONNECTION: mongoCfg },
-						execArgv: ['-r', 'ts-node/register']
+						execArgv: ['--import', 'tsx/esm']
 					}
 				}
 			});
@@ -1753,7 +1753,7 @@ describe('Job', () => {
 					path: './test/helpers/forkHelper.ts',
 					options: {
 						env: { DB_CONNECTION: mongoCfg },
-						execArgv: ['-r', 'ts-node/register']
+						execArgv: ['--import', 'tsx/esm']
 					}
 				}
 			});
@@ -1796,7 +1796,7 @@ describe('Job', () => {
 					path: './test/helpers/forkHelper.ts',
 					options: {
 						env: { DB_CONNECTION: mongoCfg },
-						execArgv: ['-r', 'ts-node/register']
+						execArgv: ['--import', 'tsx/esm']
 					}
 				},
 				defaultLockLifetime: 1000

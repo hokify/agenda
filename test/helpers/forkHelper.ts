@@ -1,4 +1,4 @@
-import { Agenda } from '../../src';
+import { Agenda } from '../../src/index.js';
 
 function isCancelMessage(message): message is { type: 'cancel'; error: string } {
 	return message !== null && typeof message === 'object' && message.type === 'cancel';
