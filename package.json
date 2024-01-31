@@ -58,6 +58,9 @@
     "human-interval": "~2",
     "luxon": "^3"
   },
+  "peerDependencies": {
+    "mongodb": ">=4"
+  },
   "devDependencies": {
     "@hokify/eslint-config": "^2.3.8",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
