@@ -9,7 +9,7 @@ Key differences with the [original repo](https://github.com/hokify/agenda) are:
 
  - MongoDB is now a peer dependency, so it must be installed separately.
  - The module is now [esm only](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c). This is to prepare for any of the dependencies - most notably `mongodb` - becoming esm-only one day too. It also helps push the ecosystem forward.
- - The library is only tested against version 6, but it should work for version 5 and even 4.
+ - The library is only tested against `mongodb@6`, but it should work for version 5 and even 4.
 
 # Agenda
 
