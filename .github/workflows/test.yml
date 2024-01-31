@@ -55,3 +55,4 @@ jobs:
         run: npm run test
         env:
           CI: true
+          MONGODB_CLIENT_VERSION: ${{ matrix.mongodb-client }}
