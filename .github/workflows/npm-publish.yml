@@ -18,12 +18,13 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org/
           cache: npm
-      - run: npm version ${TAG_NAME} --git-tag-version=false
-        env:
-          TAG_NAME: ${{ github.event.release.tag_name }}
 
       - name: Installing dependencies
         run: npm ci
+
+      - run: npm version ${TAG_NAME} --git-tag-version=false
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
 
       - name: Build
         run: npm run build
