@@ -2,18 +2,15 @@
 	"compilerOptions": {
 		"outDir": "./dist",
 		"rootDir": "./src",
-
-		// target settings for node 10
-		"module": "commonjs",
-		"target": "es2019",
-		"lib": ["es2019"],
-    // "lib": ["esnext", "esnext.asynciterable", "dom"],
+		"module": "nodenext",
+		"moduleDetection": "force",
+		"target": "es2022",
 
 		// other best practice configs
-		"moduleResolution": "node",
+		"moduleResolution": "nodenext",
 		"strict": true,
-		"noImplicitAny": false, // <-- get rid of this!
-		"removeComments": false, // <-- do not remove comments (needed for @deprecated notices etc)
+		"noImplicitAny": false,
+		"removeComments": false,
 		"emitDecoratorMetadata": true,
 		"composite": true,
 		"experimentalDecorators": true,

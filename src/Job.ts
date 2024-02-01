@@ -1,12 +1,12 @@
-import * as date from 'date.js';
-import * as debug from 'debug';
+import date from 'date.js';
+import debug from 'debug';
 import { ObjectId } from 'mongodb';
 import { ChildProcess, fork } from 'child_process';
-import type { Agenda } from './index';
-import type { DefinitionProcessor } from './types/JobDefinition';
-import { IJobParameters, datefields, TJobDatefield } from './types/JobParameters';
-import { JobPriority, parsePriority } from './utils/priority';
-import { computeFromInterval, computeFromRepeatAt } from './utils/nextRunAt';
+import type { Agenda } from './index.js';
+import type { DefinitionProcessor } from './types/JobDefinition.js';
+import { IJobParameters, datefields, TJobDatefield } from './types/JobParameters.js';
+import { JobPriority, parsePriority } from './utils/priority.js';
+import { computeFromInterval, computeFromRepeatAt } from './utils/nextRunAt.js';
 
 const log = debug('agenda:job');
 

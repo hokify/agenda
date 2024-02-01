@@ -1,6 +1,4 @@
-# AgendaTS
-
-(full typed version of agendaJS)
+# Agenda
 
 <p align="center">
   <img src="https://cdn.jsdelivr.net/gh/hokify/agenda@master/agendats.png" alt="Agenda TS" width="100" height="100">
@@ -13,7 +11,7 @@ This was originally a fork of agenda.js,
 it differs from the original version in following points:
 
 - Complete rewrite in Typescript (fully typed!)
-- mongodb4 driver (supports mongodb 5.x)
+- [mongodb@6](https://www.npmjs.com/package/mongodb) driver (supports mongodb 5.x and mongodb 4.x too)
 - Supports mongoDB sharding by name
 - touch() can have an optional progress parameter (0-100)
 - Bugfixes and improvements for locking & job processing (concurrency, lockLimit,..)

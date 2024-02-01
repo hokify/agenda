@@ -1,13 +1,13 @@
 /* eslint-disable no-console,no-unused-expressions,@typescript-eslint/no-unused-expressions */
 
-import * as delay from 'delay';
+import delay from 'delay';
 import { Db } from 'mongodb';
 import { expect } from 'chai';
-import { mockMongo } from './helpers/mock-mongodb';
+import { mockMongo } from './helpers/mock-mongodb.js';
 
-import { Agenda } from '../src';
-import { hasMongoProtocol } from '../src/utils/hasMongoProtocol';
-import { Job } from '../src/Job';
+import { Agenda } from '../src/index.js';
+import { hasMongoProtocol } from '../src/utils/hasMongoProtocol.js';
+import { Job } from '../src/Job.js';
 
 // agenda instances
 let globalAgenda: Agenda;
@@ -337,18 +337,13 @@ describe('Agenda', () => {
 						job2.attrs.nextRunAt!.toISOString()
 					);
 
-					mongoDb
+					let jobs = await mongoDb
 						.collection('agendaJobs')
 						.find({
 							name: 'unique job'
 						})
-						.toArray((err, jobs) => {
-							if (err) {
-								throw err;
-							}
-
-							expect(jobs).to.have.length(1);
-						});
+						.toArray();
+					expect(jobs).to.have.length(1);
 				});
 
 				it('should not modify job when unique matches and insertOnly is set to true', async () => {
@@ -390,18 +385,13 @@ describe('Agenda', () => {
 
 					expect(job1.attrs.nextRunAt!.toISOString()).to.equal(job2.attrs.nextRunAt!.toISOString());
 
-					mongoDb
+					let jobs = await mongoDb
 						.collection('agendaJobs')
 						.find({
 							name: 'unique job'
 						})
-						.toArray((err, jobs) => {
-							if (err) {
-								throw err;
-							}
-
-							expect(jobs).to.have.length(1);
-						});
+						.toArray();
+					expect(jobs).to.have.length(1);
 				});
 			});
 
@@ -438,18 +428,14 @@ describe('Agenda', () => {
 						.schedule(time)
 						.save();
 
-					mongoDb
+					let jobs = await mongoDb
 						.collection('agendaJobs')
 						.find({
 							name: 'unique job'
 						})
-						.toArray((err, jobs) => {
-							if (err) {
-								throw err;
-							}
+						.toArray();
 
-							expect(jobs).to.have.length(2);
-						});
+					expect(jobs).to.have.length(2);
 				});
 			});
 		});

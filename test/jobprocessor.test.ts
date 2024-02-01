@@ -3,8 +3,8 @@ import { fail } from 'assert';
 import { expect } from 'chai';
 
 import { Db } from 'mongodb';
-import { Agenda } from '../src';
-import { mockMongo } from './helpers/mock-mongodb';
+import { Agenda } from '../src/index.js';
+import { mockMongo } from './helpers/mock-mongodb.js';
 
 // Create agenda instances
 let agenda: Agenda;

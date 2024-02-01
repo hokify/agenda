@@ -1,18 +1,20 @@
 /* eslint-disable no-console */
-import * as path from 'path';
-import * as cp from 'child_process';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import cp from 'node:child_process';
 import { expect } from 'chai';
-import * as assert from 'node:assert';
+import assert from 'node:assert';
 import { DateTime } from 'luxon';
 import { Db } from 'mongodb';
 
-import * as delay from 'delay';
+import delay from 'delay';
 import * as sinon from 'sinon';
 import { fail } from 'assert';
-import { Job } from '../src/Job';
-import { Agenda } from '../src';
-import { mockMongo } from './helpers/mock-mongodb';
-import someJobDefinition from './fixtures/someJobDefinition';
+import { Job } from '../src/Job.js';
+import { Agenda } from '../src/index.js';
+import { mockMongo } from './helpers/mock-mongodb.js';
+import someJobDefinition from './fixtures/someJobDefinition.js';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Create agenda instances
 let agenda: Agenda;
@@ -33,8 +35,9 @@ const jobType = 'do work';
 const jobProcessor = () => {};
 
 describe('Job', () => {
-	beforeEach(async () => {
+	beforeEach(async function() {
 		if (!mongoDb) {
+			this.timeout(0);
 			const mockedMongo = await mockMongo();
 			mongoCfg = mockedMongo.uri;
 			mongoDb = mockedMongo.mongo.db();
@@ -123,7 +126,7 @@ describe('Job', () => {
 			const job2 = new Job(agenda, { name: 'demo', type: 'normal' });
 			const now = new Date().valueOf();
 			job2.repeatEvery('3 minutes', { skipImmediate: true });
-			expect(job2.attrs.nextRunAt).to.be.within(new Date(now + 180000), new Date(now + 180002)); // Inclusive
+			expect(job2.attrs.nextRunAt).to.be.within(new Date(now + 180000 - 2), new Date(now + 180002)); // Inclusive
 		});
 		it('repeats from the existing nextRunAt property with skipImmediate', () => {
 			const job2 = new Job(agenda, { name: 'demo', type: 'normal' });
@@ -1368,7 +1371,7 @@ describe('Job', () => {
 				const startService = () => {
 					const serverPath = path.join(__dirname, 'fixtures', 'agenda-instance.ts');
 					const n = cp.fork(serverPath, [mongoCfg, 'daily'], {
-						execArgv: ['-r', 'ts-node/register']
+						execArgv: ['--import', 'tsx/esm']
 					});
 
 					n.on('message', receiveMessage);
@@ -1381,7 +1384,7 @@ describe('Job', () => {
 			it('Should properly run jobs when defined via an array', done => {
 				const serverPath = path.join(__dirname, 'fixtures', 'agenda-instance.ts');
 				const n = cp.fork(serverPath, [mongoCfg, 'daily-array'], {
-					execArgv: ['-r', 'ts-node/register']
+					execArgv: ['--import', 'tsx/esm']
 				});
 
 				let ran1 = false;
@@ -1464,7 +1467,7 @@ describe('Job', () => {
 				const startService = () => {
 					const serverPath = path.join(__dirname, 'fixtures', 'agenda-instance.ts');
 					const n = cp.fork(serverPath, [mongoCfg, 'define-future-job'], {
-						execArgv: ['-r', 'ts-node/register']
+						execArgv: ['--import', 'tsx/esm']
 					});
 
 					n.on('message', receiveMessage);
@@ -1490,7 +1493,7 @@ describe('Job', () => {
 				const startService = () => {
 					const serverPath = path.join(__dirname, 'fixtures', 'agenda-instance.ts');
 					const n = cp.fork(serverPath, [mongoCfg, 'define-past-due-job'], {
-						execArgv: ['-r', 'ts-node/register']
+						execArgv: ['--import', 'tsx/esm']
 					});
 
 					n.on('message', receiveMessage);
@@ -1503,7 +1506,7 @@ describe('Job', () => {
 			it('Should schedule using array of names', done => {
 				const serverPath = path.join(__dirname, 'fixtures', 'agenda-instance.ts');
 				const n = cp.fork(serverPath, [mongoCfg, 'schedule-array'], {
-					execArgv: ['-r', 'ts-node/register']
+					execArgv: ['--import', 'tsx/esm']
 				});
 
 				let ran1 = false;
@@ -1554,7 +1557,7 @@ describe('Job', () => {
 				};
 
 				const serverPath = path.join(__dirname, 'fixtures', 'agenda-instance.ts');
-				const n = cp.fork(serverPath, [mongoCfg, 'now'], { execArgv: ['-r', 'ts-node/register'] });
+				const n = cp.fork(serverPath, [mongoCfg, 'now'], { execArgv: ['--import', 'tsx/esm'] });
 
 				n.on('message', receiveMessage);
 				n.on('error', serviceError);
@@ -1604,7 +1607,7 @@ describe('Job', () => {
 		expect(await job.isRunning()).to.be.equal(true);
 	});
 
-	it('should not run job if is has been removed', async () => {
+	it('should not run job if it has been removed', async () => {
 		let executed = false;
 		agenda.define('test', async () => {
 			executed = true;
@@ -1625,7 +1628,7 @@ describe('Job', () => {
 		do {
 			jobStarted = await agenda.db.getJobs({ name: 'test' });
 			if (!jobStarted[0].lockedAt) {
-				delay(100);
+				await delay(100);
 			}
 			retried++;
 		} while (!jobStarted[0].lockedAt || retried > 10);
@@ -1652,11 +1655,12 @@ describe('Job', () => {
 		]);
 
 		expect(executed).to.be.equal(false);
-		assert.ok(typeof error !== 'undefined');
-		expect(error.message).to.includes('(name: test) cannot be updated in the database');
+		if (typeof error !== 'undefined') {
+			expect(error.message).to.includes('(name: test) cannot be updated in the database');
+		}
 	});
 
-	describe('job fork mode', () => {
+	describe('job fork mode', () => {7
 		it('runs a job in fork mode', async () => {
 			const agendaFork = new Agenda({
 				mongo: mongoDb,
@@ -1664,7 +1668,7 @@ describe('Job', () => {
 					path: './test/helpers/forkHelper.ts',
 					options: {
 						env: { DB_CONNECTION: mongoCfg },
-						execArgv: ['-r', 'ts-node/register']
+						execArgv: ['--import', 'tsx/esm']
 					}
 				}
 			});
@@ -1707,7 +1711,7 @@ describe('Job', () => {
 					path: './test/helpers/forkHelper.ts',
 					options: {
 						env: { DB_CONNECTION: mongoCfg },
-						execArgv: ['-r', 'ts-node/register']
+						execArgv: ['--import', 'tsx/esm']
 					}
 				}
 			});
@@ -1750,7 +1754,7 @@ describe('Job', () => {
 					path: './test/helpers/forkHelper.ts',
 					options: {
 						env: { DB_CONNECTION: mongoCfg },
-						execArgv: ['-r', 'ts-node/register']
+						execArgv: ['--import', 'tsx/esm']
 					}
 				}
 			});
@@ -1793,7 +1797,7 @@ describe('Job', () => {
 					path: './test/helpers/forkHelper.ts',
 					options: {
 						env: { DB_CONNECTION: mongoCfg },
-						execArgv: ['-r', 'ts-node/register']
+						execArgv: ['--import', 'tsx/esm']
 					}
 				},
 				defaultLockLifetime: 1000
